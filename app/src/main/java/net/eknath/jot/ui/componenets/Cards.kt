@@ -1,15 +1,24 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package net.eknath.jot.ui.componenets
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -18,15 +27,33 @@ fun NoteDisplayCard(
     title: String,
     description: String,
     color: Color = MaterialTheme.colorScheme.primary,
-    onClick: () -> Unit
+    borderColor: Color = MaterialTheme.colorScheme.secondary,
+    shape: Shape = RoundedCornerShape(10.dp),
+    onClick: () -> Unit,
+    minSize: Boolean = false,
 ) {
+
+    val cardModifier = modifier
+        .padding(2.5.dp)
+        .then(
+            if (minSize) Modifier.wrapContentSize()
+            else Modifier
+                .fillMaxWidth()
+                .heightIn(min = 100.dp)
+        )
+        .border(width = 1.dp, color = borderColor, shape = shape)
+
+
     Card(
-        modifier = Modifier
-            .padding(2.5.dp)
-            .wrapContentSize(),
-        shape = RoundedCornerShape(10.dp)
+        modifier = cardModifier,
+        shape = shape,
+        colors = CardDefaults.cardColors(containerColor = color),
+        onClick = onClick
     ) {
-        Column(modifier = Modifier.padding(10.dp)) {
+        Column(
+            modifier = Modifier.padding(10.dp)
+        )
+        {
             Text(text = title)
             Text(text = description)
         }
