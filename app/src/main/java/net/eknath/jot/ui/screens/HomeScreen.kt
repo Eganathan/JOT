@@ -1,6 +1,13 @@
 package net.eknath.jot.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOut
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -52,7 +59,11 @@ fun HomeScreen() {
     }
 
     //CreationComponent
-    AnimatedVisibility(visible = showCreation.value) {
+    AnimatedVisibility(
+        visible = showCreation.value,
+        enter = fadeIn() + slideInHorizontally(),
+        exit = fadeOut() + slideOutHorizontally()
+    ) {
         CreationComponent(
             visibility = showCreation,
             onBackPressed = { showCreation.value = false })
