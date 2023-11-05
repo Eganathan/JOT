@@ -3,9 +3,9 @@
 package net.eknath.jot.ui.screens
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
@@ -26,24 +26,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
+import net.eknath.jot.ui.screens.states.EditorState
 
 @Composable
 fun CreationComponent(
     visibility: State<Boolean>,
+    editorState: EditorState,
     onBackPressed: () -> Unit, background:
     Color = MaterialTheme.colorScheme.background,
     focusRequester: FocusRequester = FocusRequester()
 ) {
-    Scaffold(topBar = {
-        TopAppBar(navigationIcon = {
-            IconButton(onClick = onBackPressed) {
-                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "")
-            }
-        }, title = {}, actions = {})
-    }) {
-        Column(modifier = Modifier.padding(it)) {
+    Scaffold(
+        topBar = {
+            TopAppBar(navigationIcon = {
+                IconButton(onClick = onBackPressed) {
+                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "")
+                }
+            }, title = {}, actions = {})
+        }) {
+
+        Column(
+            modifier = Modifier
+                .padding(it)
+                .fillMaxSize()
+                .imePadding()
+        ) {
             val textFieldColor = TextFieldDefaults.textFieldColors(
                 containerColor = background,
 
@@ -57,28 +64,27 @@ fun CreationComponent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight(),
-                value = TextFieldValue(),
-                onValueChange = {},
+                value = editorState.titleTextFieldState.value,
+                onValueChange = { editorState.titleTextFieldState.value = it },
                 placeholder = { Text("Title") },
                 colors = textFieldColor
             )
 
             TextField(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
+                    .fillMaxSize()
                     .focusRequester(focusRequester),
-                value = TextFieldValue(),
-                onValueChange = {},
+                value = editorState.entryTextFieldState.value,
+                onValueChange = {
+                    editorState.entryTextFieldState.value = it
+                },
                 placeholder = { Text(text = "note") },
                 colors = textFieldColor
             )
-
         }
     }
-    LaunchedEffect(key1 = visibility, block = {
-        if (visibility.value)
-            focusRequester.requestFocus()
-    })
 
+    LaunchedEffect(key1 = editorState.entryTextFieldState, block = {
+        focusRequester.requestFocus()
+    })
 }

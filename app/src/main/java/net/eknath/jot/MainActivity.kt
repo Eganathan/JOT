@@ -6,12 +6,6 @@
 
 package net.eknath.jot
 
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.Shape
-
 import android.os.Bundle
 import android.os.UserManager
 import androidx.activity.ComponentActivity
@@ -79,8 +73,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.mohamedrejeb.richeditor.model.rememberRichTextState
-import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
+import androidx.core.view.WindowCompat
 import net.eknath.jot.ui.componenets.NoteDisplayCard
 import net.eknath.jot.ui.screens.HomeScreen
 import net.eknath.jot.ui.theme.JOTTheme
@@ -89,6 +82,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+
             JOTTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
