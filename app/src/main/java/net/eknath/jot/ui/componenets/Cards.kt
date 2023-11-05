@@ -2,6 +2,7 @@
 
 package net.eknath.jot.ui.componenets
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,10 +40,9 @@ fun NoteDisplayCard(
             if (minSize) Modifier.wrapContentSize()
             else Modifier
                 .fillMaxWidth()
-                .heightIn(min = 100.dp)
+                .wrapContentHeight()
         )
-        .border(width = 1.dp, color = borderColor, shape = shape)
-
+//        .border(width = 1.dp, color = borderColor, shape = shape)
 
     Card(
         modifier = cardModifier,
@@ -51,10 +51,11 @@ fun NoteDisplayCard(
         onClick = onClick
     ) {
         Column(
-            modifier = Modifier.padding(10.dp)
+            modifier = Modifier.padding(10.dp),
         )
         {
-            Text(text = title)
+            if (title.isNotBlank())
+                Text(text = title)
             Text(text = description)
         }
 

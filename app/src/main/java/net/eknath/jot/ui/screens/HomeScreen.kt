@@ -33,27 +33,27 @@ import net.eknath.jot.ui.screens.states.EditorState
 fun HomeScreen(editorState: EditorState) {
     val showCreation = remember { mutableStateOf(false) }
 
-    Scaffold(bottomBar = {
-        BottomAppBar {}
-    }, floatingActionButton = {
-        FloatingActionButton(onClick = {
-            showCreation.value = true
-        }, shape = RoundedCornerShape(10.dp)) {
-            Icon(imageVector = Icons.Default.Add, contentDescription = "")
-        }
-    }, floatingActionButtonPosition = FabPosition.End
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                editorState.resetTextFieldAndSelection()
+                showCreation.value = true
+            }, shape = RoundedCornerShape(10.dp)) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = "")
+            }
+        }, floatingActionButtonPosition = FabPosition.End
     ) {
-        LazyColumn(
-            modifier = Modifier.padding(it),
+        LazyColumn(modifier = Modifier.padding(it),
             contentPadding = PaddingValues(5.dp),
             content = {
                 items(editorState.jotterList.value) {
-                    NoteDisplayCard(
-                        title = it.title,
-                        description = it.note,
-                        onClick = {
-                           Log.e("Test","title: ${it.title} description: ${it.note}")
-                        })
+                    NoteDisplayCard(title = it.title, description = it.note, onClick = {
+                        editorState.getJot(id = it.id,
+                            onSuccess = { showCreation.value = true },
+                            onFailure = {
+
+                            })
+                    })
                 }
             })
     }
@@ -64,9 +64,14 @@ fun HomeScreen(editorState: EditorState) {
         enter = fadeIn() + slideInHorizontally(),
         exit = fadeOut() + slideOutHorizontally()
     ) {
-        CreationComponent(
-            visibility = showCreation,
-            editorState = editorState,
-            onBackPressed = { showCreation.value = false })
+        CreationComponent(visibility = showCreation, editorState = editorState,
+            onBackPressed = {
+                if (editorState.selectedJot.value == null) {
+                    editorState.createJot()
+                } else {
+                    editorState.updateJot()
+                }
+                showCreation.value = false
+            })
     }
 }

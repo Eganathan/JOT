@@ -2,6 +2,7 @@
 
 package net.eknath.jot.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
@@ -60,11 +62,11 @@ fun CreationComponent(
                 focusedIndicatorColor = background,
                 unfocusedIndicatorColor = background
             )
-            Button(onClick = {
-                editorState.createJot()
-            }) {
-                Text(text = "CREATE")
-            }
+//            Button(onClick = {
+//                editorState.createJot()
+//            }) {
+//                Text(text = "CREATE")
+//            }
 
             TextField(
                 modifier = Modifier
@@ -88,9 +90,15 @@ fun CreationComponent(
                 colors = textFieldColor
             )
         }
+
+        BackHandler(enabled = true, onBack = onBackPressed)
     }
 
     LaunchedEffect(key1 = editorState.entryTextFieldState, block = {
         focusRequester.requestFocus()
+    })
+
+    DisposableEffect(key1 = visibility.value, effect = {
+        onDispose { editorState.resetTextFieldAndSelection() }
     })
 }
