@@ -75,7 +75,9 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import net.eknath.jot.ui.componenets.NoteDisplayCard
+import net.eknath.jot.ui.screens.EditorViewModel
 import net.eknath.jot.ui.screens.HomeScreen
+import net.eknath.jot.ui.screens.states.EditorState
 import net.eknath.jot.ui.theme.JOTTheme
 
 class MainActivity : ComponentActivity() {
@@ -84,11 +86,14 @@ class MainActivity : ComponentActivity() {
         setContent {
             WindowCompat.setDecorFitsSystemWindows(window, false)
 
+            val viewModel = EditorViewModel()
+            val editorState = EditorState(viewModel)
+
             JOTTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    HomeScreen()
+                    HomeScreen(editorState = editorState)
                 }
             }
         }

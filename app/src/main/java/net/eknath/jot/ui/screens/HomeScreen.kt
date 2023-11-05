@@ -1,5 +1,6 @@
 package net.eknath.jot.ui.screens
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -8,6 +9,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -28,9 +30,8 @@ import net.eknath.jot.ui.screens.states.EditorState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(editorState: EditorState) {
     val showCreation = remember { mutableStateOf(false) }
-    val editorState = remember { EditorState() }
 
     Scaffold(bottomBar = {
         BottomAppBar {}
@@ -46,11 +47,13 @@ fun HomeScreen() {
             modifier = Modifier.padding(it),
             contentPadding = PaddingValues(5.dp),
             content = {
-                items(25) {
+                items(editorState.jotterList.value) {
                     NoteDisplayCard(
-                        title = "SOme Title Was here ${it}",
-                        description = "Descripton ${it} of the title required!",
-                        onClick = {})
+                        title = it.title,
+                        description = it.note,
+                        onClick = {
+                           Log.e("Test","title: ${it.title} description: ${it.note}")
+                        })
                 }
             })
     }
