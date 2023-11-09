@@ -1,18 +1,18 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-//    id("dagger.hilt.android.plugin")
-//    id("kotlin-kapt")
+    id("dagger.hilt.android.plugin")
+    id("kotlin-kapt")
 }
 
 android {
     namespace = "net.eknath.jot"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "net.eknath.jot"
         minSdk = 24
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -41,6 +41,10 @@ android {
     buildFeatures {
         compose = true
     }
+    // Allow references to generated code
+    kapt {
+        correctErrorTypes = true
+    }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.0"
     }
@@ -62,18 +66,17 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
 
-////    Room Database
-//    implementation ("androidx.room:room-runtime:2.4.3")
-//    kapt ("androidx.room:room-compiler:2.4.3")
-//
-//
-//    //Hilt
-//    implementation("com.google.dagger:hilt-android:2.44.2")
-//    kapt("com.google.dagger:hilt-android-compiler:2.44.2")
-//    implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")
-//
+//    Room Database
+    implementation ("androidx.room:room-runtime:2.6.0")
+    kapt ("androidx.room:room-compiler:2.6.0")
+
+    //Hilt
+    implementation("com.google.dagger:hilt-android:2.48")
+    kapt("com.google.dagger:hilt-android-compiler:2.48")
+    implementation ("androidx.hilt:hilt-navigation-compose:1.1.0")
+
 //    //Navigation
-//    implementation ("androidx.navigation:navigation-compose:2.5.3")
+//    implementation ("androidx.navigation:navigation-compose:2.7.5")
 
 
 
