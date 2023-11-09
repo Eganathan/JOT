@@ -54,6 +54,7 @@ class EditorViewModel() : ViewModel() {
         if (newNote.note.isNotBlank()) {
             _jotterList.value = state.value.plus(newNote)
         }
+        _selectedJot.value = newNote
         return if (state.value.contains(newNote)) Status.Success("") else Status.Failed("")
     }
 
