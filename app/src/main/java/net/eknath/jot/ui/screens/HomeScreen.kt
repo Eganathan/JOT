@@ -92,13 +92,12 @@ fun HomeScreen(editorState: EditorState) {
         enter = fadeIn() + slideInHorizontally(),
         exit = fadeOut() + slideOutHorizontally()
     ) {
-        CreationComponent(visibility = showCreation, editorState = editorState, onBackPressed = {
-            if (editorState.selectedJot.value == null) {
-                editorState.createJot()
-            } else {
-                editorState.updateJot()
+        CreationComponent(
+            visibility = showCreation,
+            editorState = editorState,
+            onBackPressed = {
+                showCreation.value = false
             }
-            showCreation.value = false
-        })
+        )
     }
 }

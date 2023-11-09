@@ -62,18 +62,24 @@ fun CreationComponent(
                 focusedIndicatorColor = background,
                 unfocusedIndicatorColor = background
             )
-//            Button(onClick = {
-//                editorState.createJot()
-//            }) {
-//                Text(text = "CREATE")
-//            }
+
+            val onValueChange: () -> Unit = {
+                if (editorState.selectedJot.value == null) {
+                    editorState.createJot()
+                } else {
+                    editorState.updateJot()
+                }
+            }
 
             TextField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight(),
                 value = editorState.titleTextFieldState.value,
-                onValueChange = { editorState.titleTextFieldState.value = it },
+                onValueChange = {
+                    editorState.titleTextFieldState.value = it
+                    onValueChange.invoke()
+                },
                 placeholder = { Text("Title") },
                 colors = textFieldColor
             )
@@ -85,6 +91,7 @@ fun CreationComponent(
                 value = editorState.entryTextFieldState.value,
                 onValueChange = {
                     editorState.entryTextFieldState.value = it
+                    onValueChange.invoke()
                 },
                 placeholder = { Text(text = "note") },
                 colors = textFieldColor

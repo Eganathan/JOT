@@ -1,0 +1,21 @@
+
+P
+ app/src/main/AndroidManifest.xml,8/c/8c55c3ccc257e5907959013f99656e4c8ec3903e
+b
+2app/src/main/java/net/eknath/jot/ui/theme/Theme.kt,1/4/14fe1e5d5b70acf871f862d2b4409b25901e9979
+b
+2app/src/main/java/net/eknath/jot/ui/theme/Color.kt,e/7/e71b5260d8c7fc6d79176b00ebc9c1ff797d713f
+n
+>app/src/main/java/net/eknath/jot/ui/screens/EditorViewModel.kt,a/3/a391d57910c848b686466f31335cb26eccabe190
+m
+=app/src/main/java/net/eknath/jot/ui/screens/CreationScreen.kt,6/f/6ffa5a8c5019d7464daea3141fa9031bbeb932e0
+a
+1app/src/main/java/net/eknath/jot/ui/theme/Type.kt,2/c/2cbc654cd5e664350fcd9d40fbb58197e3da81e8
+h
+8app/src/main/java/net/eknath/jot/ui/componenets/Cards.kt,1/2/122c5ebb83171f481a5e950c137780fea2d11b5e
+i
+9app/src/main/java/net/eknath/jot/ui/screens/HomeScreen.kt,1/1/11628b3222470664f5f5e7ef5c9f3385b1fa7075
+`
+0app/src/main/java/net/eknath/jot/MainActivity.kt,3/7/37ebfa5dc718dbbdfdf0dc263100d13513f637f7
+q
+Aapp/src/main/java/net/eknath/jot/ui/screens/states/EditorState.kt,c/e/ceb7e9254df49b9a8a7cb5859a0504b4d1157363
