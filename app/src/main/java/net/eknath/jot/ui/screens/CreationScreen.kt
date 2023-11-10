@@ -2,6 +2,7 @@
 
 package net.eknath.jot.ui.screens
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -63,13 +64,15 @@ fun CreationComponent(
                 unfocusedIndicatorColor = background
             )
 
-//            val onValueChange: () -> Unit = {
-//                if (editorState.selectedJot.value == null) {
-//                    editorState.createJot()
-//                } else {
-//                    editorState.updateJot()
-//                }
-//            }
+            val onValueChange: () -> Unit = {
+                if (editorState.viewModel.selectedNoteId.value == null) {
+                    Log.e("COM","CREATION")
+                    editorState.createJot()
+                } else {
+                    Log.e("COM","UPDATE")
+                    editorState.updateJot()
+                }
+            }
 
             TextField(
                 modifier = Modifier
@@ -78,7 +81,7 @@ fun CreationComponent(
                 value = editorState.titleTextFieldState.value,
                 onValueChange = {
                     editorState.titleTextFieldState.value = it
-//                    onValueChange.invoke()
+                    onValueChange.invoke()
                 },
                 placeholder = { Text("Title") },
                 colors = textFieldColor
@@ -91,7 +94,7 @@ fun CreationComponent(
                 value = editorState.entryTextFieldState.value,
                 onValueChange = {
                     editorState.entryTextFieldState.value = it
-//                    onValueChange.invoke()
+                    onValueChange.invoke()
                 },
                 placeholder = { Text(text = "note") },
                 colors = textFieldColor
@@ -101,9 +104,9 @@ fun CreationComponent(
         BackHandler(enabled = true, onBack = onBackPressed)
     }
 
-    LaunchedEffect(key1 = editorState.entryTextFieldState, block = {
-        focusRequester.requestFocus()
-    })
+//    LaunchedEffect(key1 = editorState.entryTextFieldState, block = {
+//        focusRequester.requestFocus()
+//    })
 
     DisposableEffect(key1 = visibility.value, effect = {
         onDispose { editorState.resetTextFieldAndSelection() }

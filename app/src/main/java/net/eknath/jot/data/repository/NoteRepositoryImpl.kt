@@ -18,14 +18,14 @@ class NoteRepositoryImpl(
         }
     }
 
-    override suspend fun getNoteById(noteId: Long): Note? {
-        val noteEntity = noteDao.getNoteById(noteId)
-        return noteEntity?.let(noteMapper::mapToDomain)
+    override fun getNoteById(noteId: Long): Note? {
+        val note =  noteDao.getNoteById(noteId)
+        return note?.let { noteMapper.mapToDomain(it) }
     }
 
-    override suspend fun insert(note: Note) {
+    override suspend fun insert(note: Note): Long {
         val noteEntity = noteMapper.mapToEntity(note)
-        noteDao.insert(noteEntity)
+        return  noteDao.insert(noteEntity)
     }
 
     override suspend fun update(note: Note) {

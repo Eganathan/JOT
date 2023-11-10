@@ -84,12 +84,10 @@ fun HomeScreen(editorState: EditorState) {
                         title = it.title,
                         description = it.content,
                         onClick = {
-                            Log.e("Test", "ID: ${it.id}")
-//                            editorState.getJot(id = it.id,
-//                                onSuccess = { showCreation.value = true },
-//                                onFailure = {
-//
-//                                })
+                            editorState.getJot(
+                                id = it.id,
+                                onSuccess = { showCreation.value = true },
+                                onFailure = {})
                         })
                 }
             })
@@ -106,7 +104,6 @@ fun HomeScreen(editorState: EditorState) {
             editorState = editorState,
             onBackPressed = {
                 showCreation.value = false
-                editorState.createJot()
             }
         )
     }

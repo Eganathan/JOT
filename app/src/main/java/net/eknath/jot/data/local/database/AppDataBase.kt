@@ -29,6 +29,7 @@ abstract class AppDatabase : RoomDatabase() {
                     // if no Migration object.
                     // Migration is not part of this example.
                     .fallbackToDestructiveMigration()
+                    .allowMainThreadQueries() //Todo need to remove this at the earlist
                     .build()
                 INSTANCE = instance
                 // return instance

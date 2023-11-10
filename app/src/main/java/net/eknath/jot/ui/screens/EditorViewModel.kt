@@ -1,27 +1,46 @@
 package net.eknath.jot.ui.screens
 
+import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import net.eknath.jot.domain.model.Note
 import net.eknath.jot.domain.usecase.AddNoteUseCase
 import net.eknath.jot.domain.usecase.DeleteNoteUseCase
 import net.eknath.jot.domain.usecase.GetAllNotesUseCase
+import net.eknath.jot.domain.usecase.GetNoteUseCase
 import net.eknath.jot.domain.usecase.UpdateNoteUseCase
 
 
 class NoteViewModel(
     private val getAllNotesUseCase: GetAllNotesUseCase,
+    private val getNoteUseCase: GetNoteUseCase,
     private val addNoteUseCase: AddNoteUseCase,
     private val updateNoteUseCase: UpdateNoteUseCase,
     private val deleteNoteUseCase: DeleteNoteUseCase
 ) : ViewModel() {
 
+    val selectedNoteId: MutableState<Long?> = mutableStateOf(null)
+    val selectedNote: MutableState<Note?> = mutableStateOf(null)
+
     val notes = getAllNotesUseCase().asLiveData()
 
     fun addNote(note: Note) = viewModelScope.launch {
-        addNoteUseCase(note)
+        selectedNoteId.value = addNoteUseCase(note)
+        Log.e("VM", "SelectedNoteID: ${selectedNoteId.value}")
+    }
+
+    fun getNoteById(id: Long) = viewModelScope.launch {
+        val note = getNoteUseCase(id)
+        if (note != null) {
+            selectedNoteId.value = note.id
+            selectedNote.value = note
+            Log.e("VM", "GOT: ${selectedNote}")
+        }
     }
 
     fun updateNote(note: Note) = viewModelScope.launch {
@@ -30,6 +49,10 @@ class NoteViewModel(
 
     fun deleteNote(note: Note) = viewModelScope.launch {
         deleteNoteUseCase(note)
+    }
+
+    fun resetSelection() {
+        selectedNoteId.value = null
     }
 }
 
@@ -91,10 +114,6 @@ class NoteViewModel(
 //            }
 //        }
 //        return if (state.value.contains(newNote)) Status.Success("") else Status.Failed("")
-//    }
-//
-//    fun resetSelection() {
-//        _selectedJot.value = null
 //    }
 //
 //
