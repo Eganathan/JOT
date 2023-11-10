@@ -38,8 +38,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import dagger.hilt.android.AndroidEntryPoint
-import net.eknath.jot.ui.screens.EditorViewModel
+import net.eknath.jot.data.local.database.AppDatabase
+import net.eknath.jot.data.local.database.NoteDao
+import net.eknath.jot.data.mapper.NoteMapper
+import net.eknath.jot.data.repository.NoteRepositoryImpl
+import net.eknath.jot.domain.usecase.AddNoteUseCase
+import net.eknath.jot.domain.usecase.DeleteNoteUseCase
+import net.eknath.jot.domain.usecase.GetAllNotesUseCase
+import net.eknath.jot.domain.usecase.UpdateNoteUseCase
 import net.eknath.jot.ui.screens.HomeScreen
+import net.eknath.jot.ui.screens.NoteViewModel
 import net.eknath.jot.ui.screens.states.EditorState
 import net.eknath.jot.ui.theme.JOTTheme
 
@@ -49,7 +57,18 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             WindowCompat.setDecorFitsSystemWindows(window, false)
-            val viewModel = EditorViewModel()
+
+
+            val database = AppDatabase.getDatabase(this)
+            val repository =
+                NoteRepositoryImpl(noteDao = database.noteDao(), noteMapper = NoteMapper())
+
+            val viewModel = NoteViewModel(
+                getAllNotesUseCase = GetAllNotesUseCase(noteRepository = repository),
+                addNoteUseCase = AddNoteUseCase(noteRepository = repository),
+                updateNoteUseCase = UpdateNoteUseCase(noteRepository = repository),
+                deleteNoteUseCase = DeleteNoteUseCase(noteRepository = repository)
+            )
             val editorState = EditorState(viewModel)
 
             JOTTheme {

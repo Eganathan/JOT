@@ -30,6 +30,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -37,6 +39,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.asFlow
 import net.eknath.jot.R
 import net.eknath.jot.ui.componenets.NoteDisplayCard
 import net.eknath.jot.ui.screens.states.EditorState
@@ -46,6 +49,8 @@ import net.eknath.jot.ui.screens.states.EditorState
 @Composable
 fun HomeScreen(editorState: EditorState) {
     val showCreation = remember { mutableStateOf(false) }
+
+    val notes by editorState.viewModel.notes.asFlow().collectAsState(initial = emptyList())
 
     Scaffold(topBar = {
         CenterAlignedTopAppBar(modifier = Modifier.shadow(elevation = 10.dp), title = {
@@ -74,14 +79,18 @@ fun HomeScreen(editorState: EditorState) {
             modifier = Modifier.padding(it),
             contentPadding = PaddingValues(5.dp),
             content = {
-                items(editorState.jotterList.value) {
-                    NoteDisplayCard(title = it.title, description = it.note, onClick = {
-                        editorState.getJot(id = it.id,
-                            onSuccess = { showCreation.value = true },
-                            onFailure = {
-
-                            })
-                    })
+                items(notes) {
+                    NoteDisplayCard(
+                        title = it.title,
+                        description = it.content,
+                        onClick = {
+                            Log.e("Test", "ID: ${it.id}")
+//                            editorState.getJot(id = it.id,
+//                                onSuccess = { showCreation.value = true },
+//                                onFailure = {
+//
+//                                })
+                        })
                 }
             })
     }
@@ -97,6 +106,7 @@ fun HomeScreen(editorState: EditorState) {
             editorState = editorState,
             onBackPressed = {
                 showCreation.value = false
+                editorState.createJot()
             }
         )
     }

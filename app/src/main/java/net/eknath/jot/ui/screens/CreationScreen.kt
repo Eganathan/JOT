@@ -63,13 +63,13 @@ fun CreationComponent(
                 unfocusedIndicatorColor = background
             )
 
-            val onValueChange: () -> Unit = {
-                if (editorState.selectedJot.value == null) {
-                    editorState.createJot()
-                } else {
-                    editorState.updateJot()
-                }
-            }
+//            val onValueChange: () -> Unit = {
+//                if (editorState.selectedJot.value == null) {
+//                    editorState.createJot()
+//                } else {
+//                    editorState.updateJot()
+//                }
+//            }
 
             TextField(
                 modifier = Modifier
@@ -78,7 +78,7 @@ fun CreationComponent(
                 value = editorState.titleTextFieldState.value,
                 onValueChange = {
                     editorState.titleTextFieldState.value = it
-                    onValueChange.invoke()
+//                    onValueChange.invoke()
                 },
                 placeholder = { Text("Title") },
                 colors = textFieldColor
@@ -91,7 +91,7 @@ fun CreationComponent(
                 value = editorState.entryTextFieldState.value,
                 onValueChange = {
                     editorState.entryTextFieldState.value = it
-                    onValueChange.invoke()
+//                    onValueChange.invoke()
                 },
                 placeholder = { Text(text = "note") },
                 colors = textFieldColor
