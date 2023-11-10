@@ -43,12 +43,12 @@ import net.eknath.jot.ui.screens.HomeScreen
 import net.eknath.jot.ui.screens.states.EditorState
 import net.eknath.jot.ui.theme.JOTTheme
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             WindowCompat.setDecorFitsSystemWindows(window, false)
-
             val viewModel = EditorViewModel()
             val editorState = EditorState(viewModel)
 
