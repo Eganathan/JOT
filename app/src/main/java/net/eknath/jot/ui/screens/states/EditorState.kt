@@ -57,6 +57,10 @@ class EditorState(val viewModel: NoteViewModel) {
         }
     }
 
+    fun bulkDelete(noteIds:List<Long>){
+        viewModel.deleteNotes(notes = noteIds)
+    }
+
     fun resetTextFieldAndSelection() {
         titleTextFieldState.value = TextFieldValue()
         entryTextFieldState.value = TextFieldValue()

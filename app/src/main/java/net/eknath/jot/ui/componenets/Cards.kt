@@ -28,8 +28,9 @@ fun NoteDisplayCard(
     title: String,
     description: String,
     color: Color = MaterialTheme.colorScheme.primary,
-    borderColor: Color = MaterialTheme.colorScheme.secondary,
+    borderColor: Color = Color.Red,//MaterialTheme.colorScheme.secondary,
     shape: Shape = RoundedCornerShape(10.dp),
+    isSelected: Boolean,
     onClick: () -> Unit,
     minSize: Boolean = false,
 ) {
@@ -41,14 +42,18 @@ fun NoteDisplayCard(
             else Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-        )
-//        .border(width = 1.dp, color = borderColor, shape = shape)
+        ) then (if (isSelected) Modifier.border(
+        width = 3.dp,
+        color = borderColor,
+        shape = shape
+    ) else Modifier)
+
 
     Card(
         modifier = cardModifier,
         shape = shape,
         colors = CardDefaults.cardColors(containerColor = color),
-        onClick = onClick
+//        onClick =
     ) {
         Column(
             modifier = Modifier.padding(10.dp),

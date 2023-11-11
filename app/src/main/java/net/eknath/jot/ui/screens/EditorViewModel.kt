@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import net.eknath.jot.domain.model.Note
 import net.eknath.jot.domain.usecase.AddNoteUseCase
 import net.eknath.jot.domain.usecase.DeleteNoteUseCase
+import net.eknath.jot.domain.usecase.BulkDeleteUseCase
 import net.eknath.jot.domain.usecase.GetAllNotesUseCase
 import net.eknath.jot.domain.usecase.GetNoteUseCase
 import net.eknath.jot.domain.usecase.UpdateNoteUseCase
@@ -21,7 +22,8 @@ class NoteViewModel(
     private val getNoteUseCase: GetNoteUseCase,
     private val addNoteUseCase: AddNoteUseCase,
     private val updateNoteUseCase: UpdateNoteUseCase,
-    private val deleteNoteUseCase: DeleteNoteUseCase
+    private val deleteNoteUseCase: DeleteNoteUseCase,
+    private val bulkDeleteUseCase: BulkDeleteUseCase
 ) : ViewModel() {
 
     val selectedNoteId: MutableState<Long?> = mutableStateOf(null)
@@ -49,6 +51,10 @@ class NoteViewModel(
 
     fun deleteNote(note: Note) = viewModelScope.launch {
         deleteNoteUseCase(note)
+    }
+
+    fun deleteNotes(notes: List<Long>) = viewModelScope.launch {
+        bulkDeleteUseCase(notes)
     }
 
     fun resetSelection() {

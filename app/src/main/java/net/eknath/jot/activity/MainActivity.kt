@@ -43,6 +43,7 @@ import net.eknath.jot.data.local.database.NoteDao
 import net.eknath.jot.data.mapper.NoteMapper
 import net.eknath.jot.data.repository.NoteRepositoryImpl
 import net.eknath.jot.domain.usecase.AddNoteUseCase
+import net.eknath.jot.domain.usecase.BulkDeleteUseCase
 import net.eknath.jot.domain.usecase.DeleteNoteUseCase
 import net.eknath.jot.domain.usecase.GetAllNotesUseCase
 import net.eknath.jot.domain.usecase.GetNoteUseCase
@@ -61,15 +62,15 @@ class MainActivity : ComponentActivity() {
 
 
             val database = AppDatabase.getDatabase(this)
-            val repository =
-                NoteRepositoryImpl(noteDao = database.noteDao(), noteMapper = NoteMapper())
+            val repository = NoteRepositoryImpl(noteDao = database.noteDao(), noteMapper = NoteMapper())
 
             val viewModel = NoteViewModel(
                 getAllNotesUseCase = GetAllNotesUseCase(noteRepository = repository),
                 addNoteUseCase = AddNoteUseCase(noteRepository = repository),
                 updateNoteUseCase = UpdateNoteUseCase(noteRepository = repository),
                 deleteNoteUseCase = DeleteNoteUseCase(noteRepository = repository),
-                getNoteUseCase = GetNoteUseCase(repository)
+                getNoteUseCase = GetNoteUseCase(repository),
+                bulkDeleteUseCase = BulkDeleteUseCase(repository)
             )
             val editorState = EditorState(viewModel)
 

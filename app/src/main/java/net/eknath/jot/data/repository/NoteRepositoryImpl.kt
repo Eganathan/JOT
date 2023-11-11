@@ -38,4 +38,8 @@ class NoteRepositoryImpl(
         noteDao.delete(noteEntity)
     }
 
+    override suspend fun deleteAll(notes: List<Long>) {
+        noteDao.deleteAllByIds(notes)
+    }
+
 }
