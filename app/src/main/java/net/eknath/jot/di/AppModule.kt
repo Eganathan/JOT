@@ -16,24 +16,12 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
-
     @Provides
     @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
-        return Room.databaseBuilder(
-            context,
-            AppDatabase::class.java,
-            "jots_data_base"
-        )
-            .allowMainThreadQueries()
+        return Room.databaseBuilder(context, AppDatabase::class.java, "jots_data_base")
+//            .allowMainThreadQueries()
             .build()
     }
 
-    @Provides
-    @Singleton
-    fun provideNoteRepository(appDatabase: AppDatabase): NoteRepository {
-        val noteDao = appDatabase.noteDao()
-        return NoteRepositoryImpl(noteDao, NoteMapper())
-    }
 }

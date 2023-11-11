@@ -1,6 +1,5 @@
 package net.eknath.jot.ui.screens
 
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -14,7 +13,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import net.eknath.jot.domain.model.Note
@@ -30,16 +28,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NoteViewModel @Inject constructor(
-    private val noteRepository: NoteRepository
+    private val noteRepository: NoteRepository,
+    private val getAllNotesUseCase: GetAllNotesUseCase,
+    private val getNoteUseCase: GetNoteUseCase,
+    private val addNoteUseCase: AddNoteUseCase,
+    private val updateNoteUseCase: UpdateNoteUseCase,
+    private val deleteNoteUseCase: DeleteNoteUseCase,
+    private val bulkDeleteUseCase: BulkDeleteUseCase,
+    private val searchUseCase: SearchNotesUseCase
 ) : ViewModel() {
-
-    private val getAllNotesUseCase = GetAllNotesUseCase(noteRepository)
-    private val getNoteUseCase = GetNoteUseCase(noteRepository)
-    private val addNoteUseCase = AddNoteUseCase(noteRepository)
-    private val updateNoteUseCase = UpdateNoteUseCase(noteRepository)
-    private val deleteNoteUseCase = DeleteNoteUseCase(noteRepository)
-    private val bulkDeleteUseCase = BulkDeleteUseCase(noteRepository)
-    private val searchUseCase = SearchNotesUseCase(noteRepository)
 
     val selectedNoteId: MutableState<Long?> = mutableStateOf(null)
     val selectedNote: MutableState<Note?> = mutableStateOf(null)
