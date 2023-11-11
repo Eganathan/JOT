@@ -6,8 +6,9 @@ import net.eknath.jot.domain.model.Note
 interface NoteRepository {
     fun getAllNotes(): Flow<List<Note>>
     fun getNoteById(noteId: Long):Note?
+    fun searchNotes(searchQuery: String): Flow<List<Note>>
     suspend fun insert(note: Note): Long
     suspend fun update(note: Note)
-    suspend fun delete(note: Note)
+    suspend fun delete(id: Long)
     suspend fun deleteAll(notes: List<Long>)
 }

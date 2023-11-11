@@ -1,5 +1,6 @@
 package net.eknath.jot.data.repository
 
+import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import net.eknath.jot.data.local.database.NoteDao
@@ -23,6 +24,12 @@ class NoteRepositoryImpl(
         return note?.let { noteMapper.mapToDomain(it) }
     }
 
+    override fun searchNotes(searchQuery: String): Flow<List<Note>> {
+        return noteDao.searchNotes(searchQuery = searchQuery).map { entities ->
+            entities.map(noteMapper::mapToDomain)
+        }
+    }
+
     override suspend fun insert(note: Note): Long {
         val noteEntity = noteMapper.mapToEntity(note)
         return  noteDao.insert(noteEntity)
@@ -33,9 +40,8 @@ class NoteRepositoryImpl(
         noteDao.update(noteEntity)
     }
 
-    override suspend fun delete(note: Note) {
-        val noteEntity = noteMapper.mapToEntity(note)
-        noteDao.delete(noteEntity)
+    override suspend fun delete(id: Long) {
+        noteDao.delete(id)
     }
 
     override suspend fun deleteAll(notes: List<Long>) {

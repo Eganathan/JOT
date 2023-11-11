@@ -103,7 +103,10 @@ fun HomeScreen(editorState: EditorState) {
                     },
                     actions = {
                         IconButton(
-                            onClick = { editorState.bulkDelete(multiSelectedIds.value.toList()) }) {
+                            onClick = {
+                                editorState.bulkDelete(multiSelectedIds.value.toList())
+                                multiSelectedIds.value = setOf()
+                            }) {
                             Icon(imageVector = Icons.Default.Delete, contentDescription = "")
                         }
                     }

@@ -12,12 +12,14 @@ class EditorState(val viewModel: NoteViewModel) {
     val entryTextFieldState = mutableStateOf(TextFieldValue("", TextRange.Zero))
 
     fun createJot() {
-        viewModel.addNote(
-            note = Note(
-                title = titleTextFieldState.value.text,
-                content = entryTextFieldState.value.text
+        if (titleTextFieldState.value.text.isNotBlank() || entryTextFieldState.value.text.isNotBlank()) {
+            viewModel.addNote(
+                note = Note(
+                    title = titleTextFieldState.value.text,
+                    content = entryTextFieldState.value.text
+                )
             )
-        )
+        }
     }
 
     fun getJot(id: Long, onSuccess: () -> Unit = {}, onFailure: () -> Unit = {}) {
@@ -47,17 +49,21 @@ class EditorState(val viewModel: NoteViewModel) {
 
     fun updateJot() {
         viewModel.selectedNoteId.value?.let {
-            viewModel.updateNote(
-                Note(
-                    id = it,
-                    title = titleTextFieldState.value.text,
-                    content = entryTextFieldState.value.text
+            if (titleTextFieldState.value.text.isNotBlank() || entryTextFieldState.value.text.isNotBlank()) {
+                viewModel.updateNote(
+                    Note(
+                        id = it,
+                        title = titleTextFieldState.value.text,
+                        content = entryTextFieldState.value.text
+                    )
                 )
-            )
+            } else {
+                viewModel.deleteNoteById(it)
+            }
         }
     }
 
-    fun bulkDelete(noteIds:List<Long>){
+    fun bulkDelete(noteIds: List<Long>) {
         viewModel.deleteNotes(notes = noteIds)
     }
 

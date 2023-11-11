@@ -16,14 +16,17 @@ interface NoteDao {
     @Query("SELECT * FROM jots WHERE id == :id")
     fun getNoteById(id: Long): NoteEntity?
 
+    @Query("SELECT * FROM jots WHERE title LIKE :searchQuery OR content LIKE :searchQuery")
+    fun searchNotes(searchQuery: String): Flow<List<NoteEntity>>
+
     @Insert
     suspend fun insert(note: NoteEntity): Long
 
     @Update
     suspend fun update(note: NoteEntity)
 
-    @Delete
-    suspend fun delete(note: NoteEntity)
+    @Query("DELETE FROM jots WHERE id IN (:id)")
+    suspend fun delete(id: Long)
 
     @Query("DELETE FROM jots WHERE id IN (:noteIds)")
     suspend fun deleteAllByIds(noteIds: List<Long>)

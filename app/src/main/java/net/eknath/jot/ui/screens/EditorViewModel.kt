@@ -14,6 +14,7 @@ import net.eknath.jot.domain.usecase.DeleteNoteUseCase
 import net.eknath.jot.domain.usecase.BulkDeleteUseCase
 import net.eknath.jot.domain.usecase.GetAllNotesUseCase
 import net.eknath.jot.domain.usecase.GetNoteUseCase
+import net.eknath.jot.domain.usecase.SearchNotesUseCase
 import net.eknath.jot.domain.usecase.UpdateNoteUseCase
 
 
@@ -23,17 +24,19 @@ class NoteViewModel(
     private val addNoteUseCase: AddNoteUseCase,
     private val updateNoteUseCase: UpdateNoteUseCase,
     private val deleteNoteUseCase: DeleteNoteUseCase,
-    private val bulkDeleteUseCase: BulkDeleteUseCase
+    private val bulkDeleteUseCase: BulkDeleteUseCase,
+//    private val searchUseCase: SearchNotesUseCase
 ) : ViewModel() {
 
     val selectedNoteId: MutableState<Long?> = mutableStateOf(null)
     val selectedNote: MutableState<Note?> = mutableStateOf(null)
+//    val searchQuery: MutableState<String> = mutableStateOf(String())
 
     val notes = getAllNotesUseCase().asLiveData()
+//    val searchNotes = searchUseCase(searchQuery.value).asLiveData()
 
     fun addNote(note: Note) = viewModelScope.launch {
         selectedNoteId.value = addNoteUseCase(note)
-        Log.e("VM", "SelectedNoteID: ${selectedNoteId.value}")
     }
 
     fun getNoteById(id: Long) = viewModelScope.launch {
@@ -41,7 +44,6 @@ class NoteViewModel(
         if (note != null) {
             selectedNoteId.value = note.id
             selectedNote.value = note
-            Log.e("VM", "GOT: ${selectedNote}")
         }
     }
 
@@ -49,8 +51,9 @@ class NoteViewModel(
         updateNoteUseCase(note)
     }
 
-    fun deleteNote(note: Note) = viewModelScope.launch {
-        deleteNoteUseCase(note)
+    fun deleteNoteById(id: Long) = viewModelScope.launch {
+        deleteNoteUseCase(id)
+        selectedNoteId.value = null
     }
 
     fun deleteNotes(notes: List<Long>) = viewModelScope.launch {
