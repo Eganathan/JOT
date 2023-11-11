@@ -7,8 +7,9 @@ import net.eknath.jot.data.local.database.NoteDao
 import net.eknath.jot.data.mapper.NoteMapper
 import net.eknath.jot.domain.model.Note
 import net.eknath.jot.domain.repository.NoteRepository
+import javax.inject.Inject
 
-class NoteRepositoryImpl(
+class NoteRepositoryImpl @Inject constructor(
     private val noteDao: NoteDao,
     private val noteMapper: NoteMapper,
 ) : NoteRepository {
@@ -19,8 +20,8 @@ class NoteRepositoryImpl(
         }
     }
 
-    override fun getNoteById(noteId: Long): Note? {
-        val note =  noteDao.getNoteById(noteId)
+    override suspend fun getNoteById(noteId: Long): Note? {
+        val note = noteDao.getNoteById(noteId)
         return note?.let { noteMapper.mapToDomain(it) }
     }
 
@@ -32,7 +33,7 @@ class NoteRepositoryImpl(
 
     override suspend fun insert(note: Note): Long {
         val noteEntity = noteMapper.mapToEntity(note)
-        return  noteDao.insert(noteEntity)
+        return noteDao.insert(noteEntity)
     }
 
     override suspend fun update(note: Note) {

@@ -11,13 +11,13 @@ import net.eknath.jot.data.local.entity.NoteEntity
 @Dao
 interface NoteDao {
     @Query("SELECT * FROM jots")
-    fun getAllNotes(): Flow<List<NoteEntity>>
+     fun getAllNotes(): Flow<List<NoteEntity>>
 
     @Query("SELECT * FROM jots WHERE id == :id")
-    fun getNoteById(id: Long): NoteEntity?
+    suspend fun getNoteById(id: Long): NoteEntity?
 
     @Query("SELECT * FROM jots WHERE title LIKE '%' || :searchQuery || '%' OR content LIKE '%' || :searchQuery || '%'")
-    fun searchNotes(searchQuery: String): Flow<List<NoteEntity>>
+     fun searchNotes(searchQuery: String): Flow<List<NoteEntity>>
 
     @Insert
     suspend fun insert(note: NoteEntity): Long
