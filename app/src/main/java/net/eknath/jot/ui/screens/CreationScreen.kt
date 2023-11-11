@@ -2,11 +2,13 @@
 
 package net.eknath.jot.ui.screens
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
@@ -29,6 +31,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import net.eknath.jot.ui.screens.states.EditorState
 
 @Composable
@@ -64,7 +68,7 @@ fun CreationComponent(
             )
 
             val onValueChange: () -> Unit = {
-                if (editorState.selectedJot.value == null) {
+                if (editorState.viewModel.selectedNoteId.value == null) {
                     editorState.createJot()
                 } else {
                     editorState.updateJot()
@@ -80,10 +84,10 @@ fun CreationComponent(
                     editorState.titleTextFieldState.value = it
                     onValueChange.invoke()
                 },
-                placeholder = { Text("Title") },
-                colors = textFieldColor
+                placeholder = { Text("Title", style = MaterialTheme.typography.titleLarge) },
+                colors = textFieldColor,
+                textStyle = MaterialTheme.typography.titleLarge
             )
-
             TextField(
                 modifier = Modifier
                     .fillMaxSize()
@@ -93,8 +97,9 @@ fun CreationComponent(
                     editorState.entryTextFieldState.value = it
                     onValueChange.invoke()
                 },
-                placeholder = { Text(text = "note") },
-                colors = textFieldColor
+                placeholder = { Text(text = "note", style = MaterialTheme.typography.bodyLarge) },
+                colors = textFieldColor,
+                textStyle = MaterialTheme.typography.bodyLarge
             )
         }
 

@@ -4,89 +4,74 @@
     ExperimentalMaterial3Api::class
 )
 
-package net.eknath.jot
+package net.eknath.jot.activity
 
 import android.os.Bundle
-import android.os.UserManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Black
-import androidx.compose.ui.graphics.Color.Companion.Green
-import androidx.compose.ui.graphics.Color.Companion.Red
-import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.graphics.Color.Companion.Yellow
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import net.eknath.jot.ui.componenets.NoteDisplayCard
-import net.eknath.jot.ui.screens.EditorViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import net.eknath.jot.data.local.database.AppDatabase
+import net.eknath.jot.data.local.database.NoteDao
+import net.eknath.jot.data.mapper.NoteMapper
+import net.eknath.jot.data.repository.NoteRepositoryImpl
+import net.eknath.jot.domain.usecase.AddNoteUseCase
+import net.eknath.jot.domain.usecase.BulkDeleteUseCase
+import net.eknath.jot.domain.usecase.DeleteNoteUseCase
+import net.eknath.jot.domain.usecase.GetAllNotesUseCase
+import net.eknath.jot.domain.usecase.GetNoteUseCase
+import net.eknath.jot.domain.usecase.UpdateNoteUseCase
 import net.eknath.jot.ui.screens.HomeScreen
+import net.eknath.jot.ui.screens.NoteViewModel
 import net.eknath.jot.ui.screens.states.EditorState
 import net.eknath.jot.ui.theme.JOTTheme
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             WindowCompat.setDecorFitsSystemWindows(window, false)
 
-            val viewModel = EditorViewModel()
+
+            val database = AppDatabase.getDatabase(this)
+            val repository = NoteRepositoryImpl(noteDao = database.noteDao(), noteMapper = NoteMapper())
+
+            val viewModel = NoteViewModel(
+                getAllNotesUseCase = GetAllNotesUseCase(noteRepository = repository),
+                addNoteUseCase = AddNoteUseCase(noteRepository = repository),
+                updateNoteUseCase = UpdateNoteUseCase(noteRepository = repository),
+                deleteNoteUseCase = DeleteNoteUseCase(noteRepository = repository),
+                getNoteUseCase = GetNoteUseCase(repository),
+                bulkDeleteUseCase = BulkDeleteUseCase(repository)
+            )
             val editorState = EditorState(viewModel)
 
             JOTTheme {
