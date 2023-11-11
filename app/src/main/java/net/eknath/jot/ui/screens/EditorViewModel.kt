@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import net.eknath.jot.domain.model.Note
+import net.eknath.jot.domain.repository.NoteRepository
 import net.eknath.jot.domain.usecase.AddNoteUseCase
 import net.eknath.jot.domain.usecase.DeleteNoteUseCase
 import net.eknath.jot.domain.usecase.BulkDeleteUseCase
@@ -24,23 +26,27 @@ import net.eknath.jot.domain.usecase.GetAllNotesUseCase
 import net.eknath.jot.domain.usecase.GetNoteUseCase
 import net.eknath.jot.domain.usecase.SearchNotesUseCase
 import net.eknath.jot.domain.usecase.UpdateNoteUseCase
+import javax.inject.Inject
 
-
-class NoteViewModel(
-    private val getAllNotesUseCase: GetAllNotesUseCase,
-    private val getNoteUseCase: GetNoteUseCase,
-    private val addNoteUseCase: AddNoteUseCase,
-    private val updateNoteUseCase: UpdateNoteUseCase,
-    private val deleteNoteUseCase: DeleteNoteUseCase,
-    private val bulkDeleteUseCase: BulkDeleteUseCase,
-    private val searchUseCase: SearchNotesUseCase
+@HiltViewModel
+class NoteViewModel @Inject constructor(
+    private val noteRepository: NoteRepository
 ) : ViewModel() {
+
+    private val getAllNotesUseCase = GetAllNotesUseCase(noteRepository)
+    private val getNoteUseCase = GetNoteUseCase(noteRepository)
+    private val addNoteUseCase = AddNoteUseCase(noteRepository)
+    private val updateNoteUseCase = UpdateNoteUseCase(noteRepository)
+    private val deleteNoteUseCase = DeleteNoteUseCase(noteRepository)
+    private val bulkDeleteUseCase = BulkDeleteUseCase(noteRepository)
+    private val searchUseCase = SearchNotesUseCase(noteRepository)
 
     val selectedNoteId: MutableState<Long?> = mutableStateOf(null)
     val selectedNote: MutableState<Note?> = mutableStateOf(null)
 
     val notes = getAllNotesUseCase().asLiveData()
     private val searchQuery = MutableStateFlow("")
+
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val searchResults = searchQuery
         .debounce(300)  // Wait for 300ms of no input before processing the query
@@ -86,6 +92,5 @@ class NoteViewModel(
 
     fun setSearchQuery(query: String) {
         searchQuery.value = query
-        Log.e("Test","SearchQq: ${searchQuery.value}")
     }
 }

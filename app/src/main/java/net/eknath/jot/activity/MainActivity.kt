@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import net.eknath.jot.data.local.database.AppDatabase
 import net.eknath.jot.data.local.database.NoteDao
@@ -62,19 +63,19 @@ class MainActivity : ComponentActivity() {
             WindowCompat.setDecorFitsSystemWindows(window, false)
 
 
-            val database = AppDatabase.getDatabase(this)
-            val repository = NoteRepositoryImpl(noteDao = database.noteDao(), noteMapper = NoteMapper())
-
-            val viewModel = NoteViewModel(
-                getAllNotesUseCase = GetAllNotesUseCase(noteRepository = repository),
-                addNoteUseCase = AddNoteUseCase(noteRepository = repository),
-                updateNoteUseCase = UpdateNoteUseCase(noteRepository = repository),
-                deleteNoteUseCase = DeleteNoteUseCase(noteRepository = repository),
-                getNoteUseCase = GetNoteUseCase(repository),
-                bulkDeleteUseCase = BulkDeleteUseCase(repository),
-                searchUseCase = SearchNotesUseCase(repository)
-            )
-            val editorState = EditorState(viewModel)
+//            val database = AppDatabase.getDatabase(this)
+//            val repository = NoteRepositoryImpl(noteDao = database.noteDao(), noteMapper = NoteMapper())
+//
+//            val viewModel = NoteViewModel(
+//                getAllNotesUseCase = GetAllNotesUseCase(noteRepository = repository),
+//                addNoteUseCase = AddNoteUseCase(noteRepository = repository),
+//                updateNoteUseCase = UpdateNoteUseCase(noteRepository = repository),
+//                deleteNoteUseCase = DeleteNoteUseCase(noteRepository = repository),
+//                getNoteUseCase = GetNoteUseCase(repository),
+//                bulkDeleteUseCase = BulkDeleteUseCase(repository),
+//                searchUseCase = SearchNotesUseCase(repository)
+//            )
+            val editorState = EditorState(hiltViewModel())
 
             JOTTheme {
                 Surface(
