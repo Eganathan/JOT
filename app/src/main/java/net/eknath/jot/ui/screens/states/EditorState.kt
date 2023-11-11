@@ -3,6 +3,7 @@ package net.eknath.jot.ui.screens.states
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import net.eknath.jot.domain.model.Note
 import net.eknath.jot.ui.screens.NoteViewModel
 
@@ -10,6 +11,7 @@ class EditorState(val viewModel: NoteViewModel) {
 
     val titleTextFieldState = mutableStateOf(TextFieldValue("", TextRange.Zero))
     val entryTextFieldState = mutableStateOf(TextFieldValue("", TextRange.Zero))
+    val searchTextField = mutableStateOf(TextFieldValue("", TextRange.Zero))
 
     fun createJot() {
         if (titleTextFieldState.value.text.isNotBlank() || entryTextFieldState.value.text.isNotBlank()) {
@@ -71,5 +73,9 @@ class EditorState(val viewModel: NoteViewModel) {
         titleTextFieldState.value = TextFieldValue()
         entryTextFieldState.value = TextFieldValue()
         viewModel.resetSelection()
+    }
+
+    fun setSearchQuery() {
+        viewModel.setSearchQuery(searchTextField.value.text)
     }
 }
