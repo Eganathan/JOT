@@ -6,7 +6,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import net.eknath.jot.domain.model.Note
 import net.eknath.jot.domain.usecase.AddNoteUseCase
@@ -25,15 +33,27 @@ class NoteViewModel(
     private val updateNoteUseCase: UpdateNoteUseCase,
     private val deleteNoteUseCase: DeleteNoteUseCase,
     private val bulkDeleteUseCase: BulkDeleteUseCase,
-//    private val searchUseCase: SearchNotesUseCase
+    private val searchUseCase: SearchNotesUseCase
 ) : ViewModel() {
 
     val selectedNoteId: MutableState<Long?> = mutableStateOf(null)
     val selectedNote: MutableState<Note?> = mutableStateOf(null)
-//    val searchQuery: MutableState<String> = mutableStateOf(String())
 
     val notes = getAllNotesUseCase().asLiveData()
-//    val searchNotes = searchUseCase(searchQuery.value).asLiveData()
+    private val searchQuery = MutableStateFlow("")
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    val searchResults = searchQuery
+        .debounce(300)  // Wait for 300ms of no input before processing the query
+        .distinctUntilChanged()  // Only emit if the current query is different from the last
+        .flatMapLatest { query ->
+            searchUseCase(query)
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Lazily,
+            emptyList()
+        )
+
 
     fun addNote(note: Note) = viewModelScope.launch {
         selectedNoteId.value = addNoteUseCase(note)
@@ -63,67 +83,9 @@ class NoteViewModel(
     fun resetSelection() {
         selectedNoteId.value = null
     }
+
+    fun setSearchQuery(query: String) {
+        searchQuery.value = query
+        Log.e("Test","SearchQq: ${searchQuery.value}")
+    }
 }
-
-
-//
-//import androidx.compose.runtime.State
-//import androidx.compose.runtime.mutableStateOf
-//import kotlinx.coroutines.flow.MutableStateFlow
-//import kotlinx.coroutines.flow.StateFlow
-//class EditorViewModel() : ViewModel() {
-//    private val _jotterList = MutableStateFlow<List<JotNote>>(listOf())
-//    val state: StateFlow<List<JotNote>>
-//        get() = _jotterList
-//
-//    private val _selectedJot = MutableStateFlow<JotNote?>(null)
-//    val selectedJot: StateFlow<JotNote?>
-//        get() = _selectedJot
-//
-//
-//    fun getNote(id: Long): Status {
-//        val note = state.value.filter { it.id == id }
-//        _selectedJot.value = note.firstOrNull()
-//
-//        return if (_selectedJot.value?.id == id) Status.Success("") else Status.Failed("")
-//    }
-//
-//    fun createNote(useCase: EditorUseCase.Create): Status {
-//        val newNote = JotNote(
-//            id = System.currentTimeMillis(),
-//            title = useCase.title,
-//            note = useCase.note,
-//            color = useCase.color
-//        )
-//
-//        if (newNote.note.isNotBlank()) {
-//            _jotterList.value = state.value.plus(newNote)
-//        }
-//        _selectedJot.value = newNote
-//        return if (state.value.contains(newNote)) Status.Success("") else Status.Failed("")
-//    }
-//
-//    fun updateNote(useCase: EditorUseCase.Update): Status {
-//        val newNote = JotNote(
-//            id = useCase.id,
-//            title = useCase.title,
-//            note = useCase.note,
-//            color = useCase.color
-//        )
-//
-//        getNote(id = useCase.id)
-//        val currentJot = selectedJot.value
-//        if (currentJot != null && currentJot.id == newNote.id) {
-//            //delete jot
-//            _jotterList.value = _jotterList.value.minus(currentJot)
-//
-//            //to not have empty jot
-//            if (newNote.title.isNotBlank() || newNote.note.isNotBlank()) {
-//                _jotterList.value = _jotterList.value.plus(newNote).asReversed()
-//            }
-//        }
-//        return if (state.value.contains(newNote)) Status.Success("") else Status.Failed("")
-//    }
-//
-//
-//}

@@ -35,10 +35,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,9 +48,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asFlow
 import net.eknath.jot.R
@@ -63,7 +68,20 @@ enum class MODE {
 @Composable
 fun HomeScreen(editorState: EditorState) {
     val showCreation = remember { mutableStateOf(false) }
+
+    val searchState = remember { mutableStateOf(false) }
+    val searchFocusRequester = FocusRequester()
+
     val notes by editorState.viewModel.notes.asFlow().collectAsState(initial = emptyList())
+    val searchedNotes by editorState.viewModel.searchResults.collectAsState(initial = emptyList())
+    val sourceNotes by remember {
+        derivedStateOf {
+            when {
+                (searchState.value && editorState.searchTextField.value.text.isNotBlank()) -> searchedNotes
+                else -> notes
+            }
+        }
+    }
 
     val screenMode = remember { mutableStateOf(MODE.VIEW) }
     val multiSelectedIds = remember { mutableStateOf(setOf<Long>()) }
@@ -78,8 +96,32 @@ fun HomeScreen(editorState: EditorState) {
                         Icon(imageVector = Icons.Default.Menu, contentDescription = "")
                     }
                 }, actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(imageVector = Icons.Default.Search, contentDescription = "")
+                    if (searchState.value)
+                        TextField(
+                            value = editorState.searchTextField.value,
+                            onValueChange = {
+                                editorState.searchTextField.value = it
+                                editorState.setSearchQuery()
+                            },
+                            modifier = Modifier.focusRequester(searchFocusRequester)
+                        )
+
+                    IconButton(onClick = {
+                        if (searchState.value) {
+                            editorState.searchTextField.value = TextFieldValue()
+                            editorState.setSearchQuery()
+                            searchState.value = false
+                        } else {
+                            editorState.searchTextField.value = TextFieldValue()
+                            editorState.setSearchQuery()
+                            searchState.value = true
+//                            searchFocusRequester.requestFocus()
+                        }
+                    }) {
+                        Icon(
+                            imageVector = if (searchState.value) Icons.Default.Close else Icons.Default.Search,
+                            contentDescription = ""
+                        )
                     }
                 })
             else
@@ -131,7 +173,7 @@ fun HomeScreen(editorState: EditorState) {
                 item {
                     Spacer(modifier = Modifier.height(15.dp))
                 }
-                items(notes) {
+                items(sourceNotes) {
                     NoteDisplayCard(
                         title = it.title,
                         description = it.content,

@@ -16,7 +16,7 @@ interface NoteDao {
     @Query("SELECT * FROM jots WHERE id == :id")
     fun getNoteById(id: Long): NoteEntity?
 
-    @Query("SELECT * FROM jots WHERE title LIKE :searchQuery OR content LIKE :searchQuery")
+    @Query("SELECT * FROM jots WHERE title LIKE '%' || :searchQuery || '%' OR content LIKE '%' || :searchQuery || '%'")
     fun searchNotes(searchQuery: String): Flow<List<NoteEntity>>
 
     @Insert

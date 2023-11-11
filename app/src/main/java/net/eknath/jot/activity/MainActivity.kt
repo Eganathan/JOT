@@ -47,6 +47,7 @@ import net.eknath.jot.domain.usecase.BulkDeleteUseCase
 import net.eknath.jot.domain.usecase.DeleteNoteUseCase
 import net.eknath.jot.domain.usecase.GetAllNotesUseCase
 import net.eknath.jot.domain.usecase.GetNoteUseCase
+import net.eknath.jot.domain.usecase.SearchNotesUseCase
 import net.eknath.jot.domain.usecase.UpdateNoteUseCase
 import net.eknath.jot.ui.screens.HomeScreen
 import net.eknath.jot.ui.screens.NoteViewModel
@@ -70,7 +71,8 @@ class MainActivity : ComponentActivity() {
                 updateNoteUseCase = UpdateNoteUseCase(noteRepository = repository),
                 deleteNoteUseCase = DeleteNoteUseCase(noteRepository = repository),
                 getNoteUseCase = GetNoteUseCase(repository),
-                bulkDeleteUseCase = BulkDeleteUseCase(repository)
+                bulkDeleteUseCase = BulkDeleteUseCase(repository),
+                searchUseCase = SearchNotesUseCase(repository)
             )
             val editorState = EditorState(viewModel)
 
