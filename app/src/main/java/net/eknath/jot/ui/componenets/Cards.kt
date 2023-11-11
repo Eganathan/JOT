@@ -2,6 +2,7 @@
 
 package net.eknath.jot.ui.componenets
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
@@ -20,7 +21,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import net.eknath.jot.ui.screens.MODE
+import net.eknath.jot.ui.screens.onLongPressDetect
 
 @Composable
 fun NoteDisplayCard(
@@ -31,7 +35,8 @@ fun NoteDisplayCard(
     borderColor: Color = Color.Red,//MaterialTheme.colorScheme.secondary,
     shape: Shape = RoundedCornerShape(10.dp),
     isSelected: Boolean,
-    onClick: () -> Unit,
+    onTap: () -> Unit,
+    onLongPress: () -> Unit,
     minSize: Boolean = false,
 ) {
 
@@ -47,21 +52,34 @@ fun NoteDisplayCard(
         color = borderColor,
         shape = shape
     ) else Modifier)
+        .onLongPressDetect(
+            onLongPress = onLongPress,
+            onTap = onTap
+        )
 
 
     Card(
         modifier = cardModifier,
         shape = shape,
         colors = CardDefaults.cardColors(containerColor = color),
-//        onClick =
     ) {
         Column(
             modifier = Modifier.padding(10.dp),
         )
         {
             if (title.isNotBlank())
-                Text(text = title)
-            Text(text = description)
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
+                )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 10,
+                overflow = TextOverflow.Ellipsis
+            )
         }
 
     }

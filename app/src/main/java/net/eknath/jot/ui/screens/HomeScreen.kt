@@ -10,6 +10,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -63,7 +66,7 @@ fun HomeScreen(editorState: EditorState) {
     val notes by editorState.viewModel.notes.asFlow().collectAsState(initial = emptyList())
 
     val screenMode = remember { mutableStateOf(MODE.VIEW) }
-    val multiSelectedIds = remember { mutableStateOf(listOf<Long>()) }
+    val multiSelectedIds = remember { mutableStateOf(setOf<Long>()) }
 
     Scaffold(
         topBar = {
@@ -86,7 +89,7 @@ fun HomeScreen(editorState: EditorState) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             IconButton(
                                 onClick = {
-                                    multiSelectedIds.value = emptyList()
+                                    multiSelectedIds.value = emptySet()
                                     screenMode.value = MODE.VIEW
                                 }) {
                                 Icon(imageVector = Icons.Default.Close, contentDescription = "")
@@ -100,7 +103,7 @@ fun HomeScreen(editorState: EditorState) {
                     },
                     actions = {
                         IconButton(
-                            onClick = {editorState.bulkDelete(multiSelectedIds.value)}) {
+                            onClick = { editorState.bulkDelete(multiSelectedIds.value.toList()) }) {
                             Icon(imageVector = Icons.Default.Delete, contentDescription = "")
                         }
                     }
@@ -117,42 +120,38 @@ fun HomeScreen(editorState: EditorState) {
         }, floatingActionButtonPosition = FabPosition.End
     ) {
         LazyColumn(
-            modifier = Modifier.padding(it),
+            modifier = Modifier
+                .padding(it)
+                .padding(horizontal = 10.dp),
             contentPadding = PaddingValues(5.dp),
             content = {
+                item {
+                    Spacer(modifier = Modifier.height(15.dp))
+                }
                 items(notes) {
                     NoteDisplayCard(
-                        modifier = Modifier.onLongPressDetect(
-                            onLongPress = {
-                                screenMode.value = MODE.SELECTION
-                                multiSelectedIds.value = multiSelectedIds.value.plus(it.id)
-                                Log.e(
-                                    "Test",
-                                    "MODE: ${screenMode.value} selecteds: ${multiSelectedIds.value}"
-                                )
-                                Log.e("Test", "LONG PRESS")
-                            },
-                            onTap = {
-                                when (screenMode.value) {
-                                    MODE.VIEW -> {
-                                        editorState.getJot(
-                                            id = it.id,
-                                            onSuccess = { showCreation.value = true },
-                                            onFailure = {}
-                                        )
-                                    }
-
-                                    MODE.SELECTION -> {
-                                        multiSelectedIds.value = multiSelectedIds.value.plus(it.id)
-                                    }
-                                }
-                                Log.e("Test", "PRESS")
-                            }
-                        ),
                         title = it.title,
                         description = it.content,
                         isSelected = multiSelectedIds.value.contains(it.id),
-                        onClick = {})
+                        onLongPress = {
+                            screenMode.value = MODE.SELECTION
+                            multiSelectedIds.value = multiSelectedIds.value.plus(it.id)
+                        },
+                        onTap = {
+                            when (screenMode.value) {
+                                MODE.VIEW -> {
+                                    editorState.getJot(
+                                        id = it.id,
+                                        onSuccess = { showCreation.value = true },
+                                        onFailure = {}
+                                    )
+                                }
+
+                                MODE.SELECTION -> {
+                                    multiSelectedIds.value = multiSelectedIds.value.plus(it.id)
+                                }
+                            }
+                        })
                 }
             })
     }
