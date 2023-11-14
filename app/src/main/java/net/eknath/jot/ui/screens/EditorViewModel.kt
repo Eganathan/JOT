@@ -46,8 +46,8 @@ class NoteViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val searchResults = searchQuery
-        .debounce(300)  // Wait for 300ms of no input before processing the query
-        .distinctUntilChanged()  // Only emit if the current query is different from the last
+        .debounce(300)
+        .distinctUntilChanged()
         .flatMapLatest { query ->
             searchUseCase(query)
         }
