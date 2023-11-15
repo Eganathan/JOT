@@ -216,17 +216,16 @@ fun HomeScreen(editorState: EditorState) {
                                 multiSelectedIds.value = multiSelectedIds.value.plus(it.id)
                             },
                             onTap = {
-                                Log.e("Test", "ID:${it.id}")
-
                                 when (screenMode.value) {
                                     MODE.VIEW -> {
                                         editorState.getJot(id = it.id,
                                             onSuccess = { showCreation.value = true },
-                                            onFailure = {})
+                                            onFailure = {
+
+                                            })
                                     }
 
                                     MODE.SELECTION -> {
-                                        Log.e("Test", "HERE: ${multiSelectedIds.value}")
                                         multiSelectedIds.value =
                                             multiSelectedIds.value.togglePresence(it.id)
                                     }
