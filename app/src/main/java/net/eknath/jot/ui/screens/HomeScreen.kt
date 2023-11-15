@@ -210,12 +210,14 @@ fun HomeScreen(editorState: EditorState) {
                     items(sourceNotes) {
                         NoteDisplayCard(title = it.title,
                             description = it.content,
-                            isSelected = multiSelectedIds.value.contains(it.id),
+                            isSelected = multiSelectedIds.value::contains.invoke(it.id),
                             onLongPress = {
                                 screenMode.value = MODE.SELECTION
                                 multiSelectedIds.value = multiSelectedIds.value.plus(it.id)
                             },
                             onTap = {
+                                Log.e("Test", "ID:${it.id}")
+
                                 when (screenMode.value) {
                                     MODE.VIEW -> {
                                         editorState.getJot(id = it.id,
@@ -224,7 +226,9 @@ fun HomeScreen(editorState: EditorState) {
                                     }
 
                                     MODE.SELECTION -> {
-                                        multiSelectedIds.value = multiSelectedIds.value.plus(it.id)
+                                        Log.e("Test", "HERE: ${multiSelectedIds.value}")
+                                        multiSelectedIds.value =
+                                            multiSelectedIds.value.togglePresence(it.id)
                                     }
                                 }
                             })
@@ -253,4 +257,9 @@ fun Modifier.onLongPressDetect(
             onTap.invoke()
         })
     }
+}
+
+//returns a list with the element
+fun Set<Long>.togglePresence(element: Long): Set<Long> {
+    return if (this.contains(element)) this.minus(element) else this.plus(element)
 }
