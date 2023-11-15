@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">JOT</string>
+
+    <string name="note_title_placeholder">Title Here</string>
+    <string name="note_content_placeholder">Start writing your notes here…</string>
+
+    <string name="delete_warning_title">Delete Note ?</string>
+    <string name="delete_warning_content">You are attempting to delete the note, please re-confirm</string>
+    <string name="cancel">Cancel</string>
 </resources>

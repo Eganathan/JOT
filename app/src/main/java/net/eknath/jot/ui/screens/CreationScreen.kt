@@ -145,7 +145,6 @@ fun TextFieldValue.wordCount(): Int {
     return if (this.text.isBlank()) {
         0
     } else {
-        this.text.split("\\b[a-zA-Z]+[ ]".toRegex()).count()
+        this.text.split("\\b[a-zA-Z]+[ ]".toRegex()).count().minus(1)
     }
-
 }
