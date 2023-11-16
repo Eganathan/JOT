@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -27,6 +28,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -65,6 +67,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asFlow
 import kotlinx.coroutines.launch
@@ -104,7 +107,9 @@ fun HomeScreen(editorState: EditorState) {
         drawerContent = {
             ModalDrawerSheet {
                 Column(
-                    modifier = Modifier.fillMaxHeight(),
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth(0.5f),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column {
@@ -115,9 +120,30 @@ fun HomeScreen(editorState: EditorState) {
 
                     }
 
-                    Column {
-                        Text(text = "Made with love by")
-                        Text(text = "Eganathan R from India")
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(bottom = 10.dp)
+                    ) {
+                        Row(horizontalArrangement = Arrangement.SpaceAround) {
+                            Text(
+                                text = "Made with ",
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier
+                            )
+                            Icon(
+                                imageVector = Icons.Default.Favorite,
+                                contentDescription = "",
+                                tint = Color.Red,
+                                modifier = Modifier.size(15.dp)
+                            )
+                        }
+                        Text(
+                            text = "Asmakam-AppStudio",
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.labelMedium,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
             }
@@ -175,28 +201,29 @@ fun HomeScreen(editorState: EditorState) {
                         )
                     }
                 })
-                else TopAppBar(title = { /*TODO*/ }, navigationIcon = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = {
-                            multiSelectedIds.value = emptySet()
-                            screenMode.value = MODE.VIEW
-                        }) {
-                            Icon(imageVector = Icons.Default.Close, contentDescription = "")
+                else TopAppBar(title = { /*TODO*/ },
+                    navigationIcon = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(onClick = {
+                                multiSelectedIds.value = emptySet()
+                                screenMode.value = MODE.VIEW
+                            }) {
+                                Icon(imageVector = Icons.Default.Close, contentDescription = "")
+                            }
+                            Text(
+                                text = if (multiSelectedIds.value.isEmpty()) "" else "${multiSelectedIds.value.size}",
+                                modifier = Modifier.offset(y = (-3).dp),
+                                style = MaterialTheme.typography.headlineSmall
+                            )
                         }
-                        Text(
-                            text = if (multiSelectedIds.value.isEmpty()) "" else "${multiSelectedIds.value.size}",
-                            modifier = Modifier.offset(y = (-3).dp),
-                            style = MaterialTheme.typography.headlineSmall
-                        )
-                    }
-                }, actions = {
-                    IconButton(onClick = {
-                        editorState.bulkDelete(multiSelectedIds.value.toList())
-                        multiSelectedIds.value = setOf()
-                    }) {
-                        Icon(imageVector = Icons.Default.Delete, contentDescription = "")
-                    }
-                })
+                    }, actions = {
+                        IconButton(onClick = {
+                            editorState.bulkDelete(multiSelectedIds.value.toList())
+                            multiSelectedIds.value = setOf()
+                        }) {
+                            Icon(imageVector = Icons.Default.Delete, contentDescription = "")
+                        }
+                    })
             },
             floatingActionButton = {
                 FloatingActionButton(

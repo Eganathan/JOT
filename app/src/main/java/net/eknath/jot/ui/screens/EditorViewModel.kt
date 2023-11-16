@@ -6,8 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.debounce
@@ -15,6 +19,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import net.eknath.jot.di.IoDispatcher
 import net.eknath.jot.domain.model.Note
 import net.eknath.jot.domain.repository.NoteRepository
 import net.eknath.jot.domain.usecase.AddNoteUseCase
@@ -35,7 +40,8 @@ class NoteViewModel @Inject constructor(
     private val updateNoteUseCase: UpdateNoteUseCase,
     private val deleteNoteUseCase: DeleteNoteUseCase,
     private val bulkDeleteUseCase: BulkDeleteUseCase,
-    private val searchUseCase: SearchNotesUseCase
+    private val searchUseCase: SearchNotesUseCase,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     val selectedNoteId: MutableState<Long?> = mutableStateOf(null)
