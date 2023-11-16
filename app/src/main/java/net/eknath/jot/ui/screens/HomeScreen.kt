@@ -31,7 +31,12 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
@@ -113,11 +118,45 @@ fun HomeScreen(editorState: EditorState) {
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column {
-                        Text(text = "Notes")
-                        Text(text = "Lists")
+                        Text(text = "Notes and more", style = MaterialTheme.typography.labelLarge)
+                        Divider()
+
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(30.dp),
+                            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondaryContainer)
+                        ) {
+                            Row{
+
+                                Text(
+                                    text = "Notes", color = MaterialTheme.colorScheme.onBackground,
+                                    modifier = Modifier.padding(start = 15.dp).offset(y = (-3).dp)
+                                )
+                            }
+                        }
+
+
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 5.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background),
+                            onClick = { /*TODO*/ }) {
+
+                        }
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+                            onClick = { /*TODO*/ }) {
+                            Text(
+                                text = "Lists", color = MaterialTheme.colorScheme.onBackground,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Start
+                            )
+                        }
                         Text(text = "Voice Notes")
                         Text(text = "Remainders")
-
                     }
 
                     Column(
