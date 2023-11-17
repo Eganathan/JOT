@@ -87,9 +87,9 @@ enum class MODE {
 @Composable
 fun HomeScreen(editorState: EditorState) {
     val showCreation = remember { mutableStateOf(false) }
-
     val searchState = remember { mutableStateOf(false) }
     val searchFocusRequester = FocusRequester()
+
 
     val notes by editorState.viewModel.notes.asFlow().collectAsState(initial = emptyList())
     val searchedNotes by editorState.viewModel.searchResults.collectAsState(initial = emptyList())
@@ -121,20 +121,15 @@ fun HomeScreen(editorState: EditorState) {
                         Text(text = "Notes and more", style = MaterialTheme.typography.labelLarge)
                         Divider()
 
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(30.dp),
-                            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondaryContainer)
-                        ) {
-                            Row{
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 5.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                            onClick = { /*TODO*/ }) {
+                            Text(text = "Notes", textAlign = TextAlign.Start)
 
-                                Text(
-                                    text = "Notes", color = MaterialTheme.colorScheme.onBackground,
-                                    modifier = Modifier.padding(start = 15.dp).offset(y = (-3).dp)
-                                )
-                            }
                         }
-
 
                         Button(
                             modifier = Modifier
@@ -142,21 +137,18 @@ fun HomeScreen(editorState: EditorState) {
                                 .padding(horizontal = 5.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background),
                             onClick = { /*TODO*/ }) {
-
+                            Text(text = "")
                         }
+
                         Button(
                             modifier = Modifier
-                                .fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+                                .fillMaxWidth()
+                                .padding(horizontal = 5.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background),
                             onClick = { /*TODO*/ }) {
-                            Text(
-                                text = "Lists", color = MaterialTheme.colorScheme.onBackground,
-                                modifier = Modifier.fillMaxWidth(),
-                                textAlign = TextAlign.Start
-                            )
+                            Text(text = "Lists")
                         }
-                        Text(text = "Voice Notes")
-                        Text(text = "Remainders")
+
                     }
 
                     Column(
