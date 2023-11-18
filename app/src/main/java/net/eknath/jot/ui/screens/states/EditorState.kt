@@ -5,6 +5,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.eknath.jot.domain.model.Note
+import net.eknath.jot.toDateString
 import net.eknath.jot.ui.screens.NoteViewModel
 
 class EditorState(val viewModel: NoteViewModel) {
@@ -25,27 +26,27 @@ class EditorState(val viewModel: NoteViewModel) {
     }
 
     fun getJot(id: Long, onSuccess: () -> Unit = {}, onFailure: () -> Unit = {}) {
-        viewModel.getNoteById(id) //need to remove from main thread
-
-        val selectedNote = viewModel.selectedNote.value
-        if (selectedNote != null) {
-            titleTextFieldState.value = TextFieldValue(
-                text = selectedNote.title,
-                TextRange(
-                    selectedNote.title.length,
-                    selectedNote.title.length,
+        viewModel.getNoteById(id).invokeOnCompletion {
+            val selectedNote = viewModel.selectedNote.value
+            if (selectedNote != null) {
+                titleTextFieldState.value = TextFieldValue(
+                    text = selectedNote.title,
+                    TextRange(
+                        selectedNote.title.length,
+                        selectedNote.title.length,
+                    )
                 )
-            )
-            entryTextFieldState.value = TextFieldValue(
-                text = selectedNote.content,
-                TextRange(
-                    selectedNote.content.length,
-                    selectedNote.content.length,
+                entryTextFieldState.value = TextFieldValue(
+                    text = selectedNote.content,
+                    TextRange(
+                        selectedNote.content.length,
+                        selectedNote.content.length,
+                    )
                 )
-            )
-            onSuccess.invoke()
-        } else {
-            onFailure.invoke()
+                onSuccess.invoke()
+            } else {
+                onFailure.invoke()
+            }
         }
     }
 

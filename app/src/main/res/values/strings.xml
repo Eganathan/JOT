@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">JOT</string>
+
+    <string name="note_title_placeholder">Title Here</string>
+    <string name="note_content_placeholder">Start writing your notes here…</string>
+
+    <string name="word_count">Word Count:</string>
+    <string name="made_with_love">Words</string>
 </resources>

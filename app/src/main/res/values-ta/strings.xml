@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">JOT</string>
+
+    <string name="note_title_placeholder">தலைப்பு இங்கே</string>
+    <string name="note_content_placeholder">உங்கள் குறிப்புகளை இங்கே எழுதத் தொடங்குங்கள்…</string>
+
+    <string name="word_count">சொல் எண்ணிக்கை:</string>
+    <string name="made_with_love">அன்பினால் உருவாக்கப்பட்டது</string>
+</resources>
