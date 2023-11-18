@@ -2,6 +2,7 @@ package net.eknath.jot.data.mapper
 
 import net.eknath.jot.data.local.entity.NoteEntity
 import net.eknath.jot.domain.model.Note
+import net.eknath.jot.toDateString
 
 
 class NoteMapper {
@@ -9,7 +10,7 @@ class NoteMapper {
         return Note(
             id = entity.id,
             title = entity.title,
-            content = entity.content
+            content = entity.content,
         )
     }
 
