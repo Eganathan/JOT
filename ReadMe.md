@@ -9,6 +9,7 @@ This is a work in progress project
 - Create, edit, and delete notes.
 - Organize your notes into categories or folders.
 - Search for specific notes.
+- Share Notes with other apps.
 - Easy-to-use and intuitive user interface.
 - Completely offline
 
