@@ -6,8 +6,12 @@ import DrawerTitleContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.gestures.FlingBehavior
+import androidx.compose.foundation.gestures.ScrollScope
+import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -74,6 +78,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asFlow
 import kotlinx.coroutines.launch
+import net.eknath.jot.togglePresence
 import net.eknath.jot.ui.componenets.NoteDisplayCard
 import net.eknath.jot.ui.screens.states.EditorState
 
@@ -84,6 +89,7 @@ enum class MODE {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(editorState: EditorState) {
+
     val showCreation = remember { mutableStateOf(false) }
     val searchState = remember { mutableStateOf(false) }
     val searchFocusRequester = FocusRequester()
@@ -91,6 +97,7 @@ fun HomeScreen(editorState: EditorState) {
 
     val notes by editorState.viewModel.notes.asFlow().collectAsState(initial = emptyList())
     val searchedNotes by editorState.viewModel.searchResults.collectAsState(initial = emptyList())
+
     val sourceNotes = remember {
         derivedStateOf {
             when {
@@ -159,7 +166,6 @@ fun HomeScreen(editorState: EditorState) {
                         shape = RoundedCornerShape(25.dp),
                         modifier = Modifier
                             .fillMaxWidth(0.85f)
-                            .heightIn(max = 12.dp)
                             .focusRequester(searchFocusRequester)
                     )
 
@@ -180,7 +186,7 @@ fun HomeScreen(editorState: EditorState) {
                         )
                     }
                 })
-                else TopAppBar(title = { /*TODO*/ }, navigationIcon = {
+                else TopAppBar(title = {}, navigationIcon = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         IconButton(onClick = {
                             multiSelectedIds.value = emptySet()
@@ -217,7 +223,8 @@ fun HomeScreen(editorState: EditorState) {
         ) {
             LazyColumn(modifier = Modifier
                 .padding(it)
-                .padding(horizontal = 10.dp),
+                .padding(horizontal = 10.dp)
+                .fillMaxSize(),
                 contentPadding = PaddingValues(5.dp),
                 content = {
                     item { Spacer(modifier = Modifier.height(15.dp)) }
@@ -259,23 +266,12 @@ fun HomeScreen(editorState: EditorState) {
         enter = fadeIn() + slideInHorizontally(),
         exit = fadeOut() + slideOutHorizontally()
     ) {
-        CreationComponent(visibility = showCreation, editorState = editorState, onBackPressed = {
-            showCreation.value = false
-        })
+        CreationComponent(
+            visibility = showCreation,
+            editorState = editorState,
+            onBackPressed = {
+                showCreation.value = false
+            })
     }
 }
 
-fun Modifier.onLongPressDetect(
-    onLongPress: () -> Unit, onTap: () -> Unit
-): Modifier {
-    return this.pointerInput(Unit) {
-        detectTapGestures(onLongPress = { onLongPress() }, onTap = {
-            onTap.invoke()
-        })
-    }
-}
-
-//returns a list with the element
-fun Set<Long>.togglePresence(element: Long): Set<Long> {
-    return if (this.contains(element)) this.minus(element) else this.plus(element)
-}
