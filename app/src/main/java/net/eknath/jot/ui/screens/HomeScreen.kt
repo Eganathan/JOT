@@ -1,11 +1,17 @@
 package net.eknath.jot.ui.screens
 
-import android.util.Log
+import DrawerBottomCredits
+import DrawerOptionsContent
+import DrawerTitleContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.gestures.FlingBehavior
+import androidx.compose.foundation.gestures.ScrollScope
+import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,8 +19,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -70,6 +78,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asFlow
 import kotlinx.coroutines.launch
+import net.eknath.jot.togglePresence
 import net.eknath.jot.ui.componenets.NoteDisplayCard
 import net.eknath.jot.ui.screens.states.EditorState
 
@@ -80,6 +89,7 @@ enum class MODE {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(editorState: EditorState) {
+
     val showCreation = remember { mutableStateOf(false) }
     val searchState = remember { mutableStateOf(false) }
     val searchFocusRequester = FocusRequester()
@@ -87,6 +97,7 @@ fun HomeScreen(editorState: EditorState) {
 
     val notes by editorState.viewModel.notes.asFlow().collectAsState(initial = emptyList())
     val searchedNotes by editorState.viewModel.searchResults.collectAsState(initial = emptyList())
+
     val sourceNotes = remember {
         derivedStateOf {
             when {
@@ -104,82 +115,33 @@ fun HomeScreen(editorState: EditorState) {
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheet {
+            ModalDrawerSheet(modifier = Modifier.fillMaxWidth(0.5f)) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth(0.5f),
+                    modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Column {
-                        Text(text = "Notes and more", style = MaterialTheme.typography.labelLarge)
-                        Divider()
+                    Column(modifier = Modifier.fillMaxWidth()) {
 
-                        Button(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 5.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-                            onClick = { /*TODO*/ }) {
-                            Text(text = "Notes", textAlign = TextAlign.Start)
-
-                        }
-
-                        Button(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 5.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background),
-                            onClick = { /*TODO*/ }) {
-                            Text(text = "")
-                        }
-
-                        Button(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 5.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background),
-                            onClick = { /*TODO*/ }) {
-                            Text(text = "Lists")
-                        }
-
-                    }
-
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.padding(bottom = 10.dp)
-                    ) {
-                        Row(horizontalArrangement = Arrangement.SpaceAround) {
-                            Text(
-                                text = "Made with ",
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier
-                            )
-                            Icon(
-                                imageVector = Icons.Default.Favorite,
-                                contentDescription = "",
-                                tint = Color.Red,
-                                modifier = Modifier.size(15.dp)
-                            )
-                        }
-                        Text(
-                            text = "Asmakam-AppStudio",
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.labelMedium,
-                            modifier = Modifier.fillMaxWidth()
+                        DrawerTitleContent()
+                        Spacer(modifier = Modifier.height(10.dp))
+                        DrawerOptionsContent(
+                            selected = "Notes",
+                            options = listOf("Notes", "Lists", "Remainders"),
+                            upcoming = listOf("Lists", "Remainders"),
+                            onClick = {}
                         )
                     }
+
+                    DrawerBottomCredits()
                 }
             }
         },
     ) {
         Scaffold(
             topBar = {
-                if (multiSelectedIds.value.isEmpty()) CenterAlignedTopAppBar(modifier = Modifier
-                    .shadow(
-                        elevation = 10.dp
-                    ), title = {
+                if (multiSelectedIds.value.isEmpty()) CenterAlignedTopAppBar(modifier = Modifier.shadow(
+                    elevation = 10.dp
+                ), title = {
                     Text(text = "Jot-Notes+", fontWeight = FontWeight.Medium)
                 }, navigationIcon = {
                     IconButton(onClick = {
@@ -190,65 +152,62 @@ fun HomeScreen(editorState: EditorState) {
                         Icon(imageVector = Icons.Default.Menu, contentDescription = "")
                     }
                 }, actions = {
-                    if (searchState.value)
-                        TextField(
-                            value = editorState.searchTextField.value, onValueChange = {
-                                editorState.searchTextField.value = it
-                                editorState.setSearchQuery()
-                            },
-                            colors = TextFieldDefaults.textFieldColors(
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent
-                            ),
-                            singleLine = true,
-                            shape = RoundedCornerShape(25.dp),
-                            modifier = Modifier
-                                .fillMaxWidth(0.85f)
-                                .wrapContentHeight()
-                                .focusRequester(searchFocusRequester)
-                        )
+                    if (searchState.value) TextField(
+                        value = editorState.searchTextField.value,
+                        onValueChange = {
+                            editorState.searchTextField.value = it
+                            editorState.setSearchQuery()
+                        },
+                        colors = TextFieldDefaults.textFieldColors(
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        singleLine = true,
+                        shape = RoundedCornerShape(25.dp),
+                        modifier = Modifier
+                            .fillMaxWidth(0.85f)
+                            .focusRequester(searchFocusRequester)
+                    )
 
-                    IconButton(
-                        onClick = {
-                            if (searchState.value) {
-                                editorState.searchTextField.value = TextFieldValue()
-                                editorState.setSearchQuery()
-                                searchState.value = false
-                            } else {
-                                editorState.searchTextField.value = TextFieldValue()
-                                editorState.setSearchQuery()
-                                searchState.value = true
-                            }
-                        }) {
+                    IconButton(onClick = {
+                        if (searchState.value) {
+                            editorState.searchTextField.value = TextFieldValue()
+                            editorState.setSearchQuery()
+                            searchState.value = false
+                        } else {
+                            editorState.searchTextField.value = TextFieldValue()
+                            editorState.setSearchQuery()
+                            searchState.value = true
+                        }
+                    }) {
                         Icon(
                             imageVector = if (searchState.value) Icons.Default.Close else Icons.Default.Search,
                             contentDescription = ""
                         )
                     }
                 })
-                else TopAppBar(title = { /*TODO*/ },
-                    navigationIcon = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            IconButton(onClick = {
-                                multiSelectedIds.value = emptySet()
-                                screenMode.value = MODE.VIEW
-                            }) {
-                                Icon(imageVector = Icons.Default.Close, contentDescription = "")
-                            }
-                            Text(
-                                text = if (multiSelectedIds.value.isEmpty()) "" else "${multiSelectedIds.value.size}",
-                                modifier = Modifier.offset(y = (-3).dp),
-                                style = MaterialTheme.typography.headlineSmall
-                            )
-                        }
-                    }, actions = {
+                else TopAppBar(title = {}, navigationIcon = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         IconButton(onClick = {
-                            editorState.bulkDelete(multiSelectedIds.value.toList())
-                            multiSelectedIds.value = setOf()
+                            multiSelectedIds.value = emptySet()
+                            screenMode.value = MODE.VIEW
                         }) {
-                            Icon(imageVector = Icons.Default.Delete, contentDescription = "")
+                            Icon(imageVector = Icons.Default.Close, contentDescription = "")
                         }
-                    })
+                        Text(
+                            text = if (multiSelectedIds.value.isEmpty()) "" else "${multiSelectedIds.value.size}",
+                            modifier = Modifier.offset(y = (-3).dp),
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+                    }
+                }, actions = {
+                    IconButton(onClick = {
+                        editorState.bulkDelete(multiSelectedIds.value.toList())
+                        multiSelectedIds.value = setOf()
+                    }) {
+                        Icon(imageVector = Icons.Default.Delete, contentDescription = "")
+                    }
+                })
             },
             floatingActionButton = {
                 FloatingActionButton(
@@ -264,15 +223,14 @@ fun HomeScreen(editorState: EditorState) {
         ) {
             LazyColumn(modifier = Modifier
                 .padding(it)
-                .padding(horizontal = 10.dp),
+                .padding(horizontal = 10.dp)
+                .fillMaxSize(),
                 contentPadding = PaddingValues(5.dp),
                 content = {
                     item { Spacer(modifier = Modifier.height(15.dp)) }
 
-                    items(items = sourceNotes.value,
-                        key = { note -> note.id }) { note ->
-                        NoteDisplayCard(
-                            title = note.title,
+                    items(items = sourceNotes.value, key = { note -> note.id }) { note ->
+                        NoteDisplayCard(title = note.title,
                             description = note.content,
                             isSelected = multiSelectedIds.value::contains.invoke(note.id),
                             onLongPress = {
@@ -292,8 +250,8 @@ fun HomeScreen(editorState: EditorState) {
                                     MODE.SELECTION -> {
                                         multiSelectedIds.value =
                                             multiSelectedIds.value.togglePresence(note.id)
-                                        if (multiSelectedIds.value.isEmpty())
-                                            screenMode.value = MODE.VIEW
+                                        if (multiSelectedIds.value.isEmpty()) screenMode.value =
+                                            MODE.VIEW
                                     }
                                 }
                             })
@@ -308,23 +266,12 @@ fun HomeScreen(editorState: EditorState) {
         enter = fadeIn() + slideInHorizontally(),
         exit = fadeOut() + slideOutHorizontally()
     ) {
-        CreationComponent(visibility = showCreation, editorState = editorState, onBackPressed = {
-            showCreation.value = false
-        })
+        CreationComponent(
+            visibility = showCreation,
+            editorState = editorState,
+            onBackPressed = {
+                showCreation.value = false
+            })
     }
 }
 
-fun Modifier.onLongPressDetect(
-    onLongPress: () -> Unit, onTap: () -> Unit
-): Modifier {
-    return this.pointerInput(Unit) {
-        detectTapGestures(onLongPress = { onLongPress() }, onTap = {
-            onTap.invoke()
-        })
-    }
-}
-
-//returns a list with the element
-fun Set<Long>.togglePresence(element: Long): Set<Long> {
-    return if (this.contains(element)) this.minus(element) else this.plus(element)
-}

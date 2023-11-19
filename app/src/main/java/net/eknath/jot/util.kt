@@ -3,6 +3,9 @@ package net.eknath.jot
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.input.TextFieldValue
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -38,4 +41,20 @@ fun Long.toDateString(): String {
         Log.e("Date", e.localizedMessage ?: e.stackTraceToString())
         ""
     }
+}
+
+// detects long press or tap and handles the on click
+fun Modifier.onLongPressDetect(
+    onLongPress: () -> Unit, onTap: () -> Unit
+): Modifier {
+    return this.pointerInput(Unit) {
+        detectTapGestures(onLongPress = { onLongPress() }, onTap = {
+            onTap.invoke()
+        })
+    }
+}
+
+//returns a new set with the provided element if the set does not already have it else returns a new set removing the provided element...it is used for multi select
+fun Set<Long>.togglePresence(element: Long): Set<Long> {
+    return if (this.contains(element)) this.minus(element) else this.plus(element)
 }
