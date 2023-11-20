@@ -2,12 +2,9 @@
 
 package net.eknath.jot.ui.componenets
 
-import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
@@ -23,8 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import net.eknath.jot.ui.screens.MODE
-import net.eknath.jot.ui.screens.onLongPressDetect
+import net.eknath.jot.onLongPressDetect
 
 @Composable
 fun NoteDisplayCard(
