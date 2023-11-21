@@ -37,7 +37,7 @@ class NoteRepositoryImpl @Inject constructor(
 
     override suspend fun update(note: Note) {
         val noteEntity = noteMapper.mapToEntity(note)
-        noteDao.update(noteEntity)
+        noteDao.update(noteEntity.title,noteEntity.content,noteEntity.modifiedTimeStamp)
     }
 
     override suspend fun delete(id: Long) {
