@@ -18,6 +18,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.captionBar
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,6 +30,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -79,6 +85,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asFlow
 import kotlinx.coroutines.launch
 import net.eknath.jot.togglePresence
+import net.eknath.jot.ui.componenets.HomeTopBarSearchComponent
 import net.eknath.jot.ui.componenets.NoteDisplayCard
 import net.eknath.jot.ui.screens.states.EditorState
 
@@ -124,12 +131,10 @@ fun HomeScreen(editorState: EditorState) {
 
                         DrawerTitleContent()
                         Spacer(modifier = Modifier.height(10.dp))
-                        DrawerOptionsContent(
-                            selected = "Notes",
+                        DrawerOptionsContent(selected = "Notes",
                             options = listOf("Notes", "Lists", "Remainders"),
                             upcoming = listOf("Lists", "Remainders"),
-                            onClick = {}
-                        )
+                            onClick = {})
                     }
 
                     DrawerBottomCredits()
@@ -138,76 +143,64 @@ fun HomeScreen(editorState: EditorState) {
         },
     ) {
         Scaffold(
+            modifier = Modifier
+                .statusBarsPadding(),
             topBar = {
-                if (multiSelectedIds.value.isEmpty()) CenterAlignedTopAppBar(modifier = Modifier.shadow(
-                    elevation = 10.dp
-                ), title = {
-                    Text(text = "Jot-Notes+", fontWeight = FontWeight.Medium)
-                }, navigationIcon = {
-                    IconButton(onClick = {
-                        scope.launch {
-                            drawerState.open()
-                        }
-                    }) {
-                        Icon(imageVector = Icons.Default.Menu, contentDescription = "")
-                    }
-                }, actions = {
-                    if (searchState.value) TextField(
-                        value = editorState.searchTextField.value,
-                        onValueChange = {
+                if (multiSelectedIds.value.isEmpty()) {
+                    HomeTopBarSearchComponent( //todo need to look at this again too many parms
+                        modifier = Modifier
+                            .padding(horizontal = 10.dp)
+                            .padding(top = 20.dp),
+                        searchTextField = editorState.searchTextField.value,
+                        onValueChanged = {
+                            searchState.value = true
                             editorState.searchTextField.value = it
                             editorState.setSearchQuery()
                         },
-                        colors = TextFieldDefaults.textFieldColors(
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
-                        ),
-                        singleLine = true,
-                        shape = RoundedCornerShape(25.dp),
-                        modifier = Modifier
-                            .fillMaxWidth(0.85f)
-                            .focusRequester(searchFocusRequester)
-                    )
-
-                    IconButton(onClick = {
-                        if (searchState.value) {
-                            editorState.searchTextField.value = TextFieldValue()
-                            editorState.setSearchQuery()
-                            searchState.value = false
-                        } else {
-                            editorState.searchTextField.value = TextFieldValue()
-                            editorState.setSearchQuery()
+                        onOptionsClick = {
+                            scope.launch {
+                                drawerState.open()
+                            }
+                        },
+                        focusRequester = searchFocusRequester,
+                        onSearchFocused = {
                             searchState.value = true
+                            editorState.searchTextField.value = TextFieldValue()
+                        },
+                        onSearchAndClear = {
+                            if (editorState.searchTextField.value.text.isEmpty()) {
+                                searchFocusRequester.requestFocus()
+                                searchState.value = true
+                            } else {
+                                editorState.searchTextField.value = TextFieldValue()
+                                searchState.value = false
+                            }
+
+                        })
+                } else {
+                    TopAppBar(title = {}, navigationIcon = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(onClick = {
+                                multiSelectedIds.value = emptySet()
+                                screenMode.value = MODE.VIEW
+                            }) {
+                                Icon(imageVector = Icons.Default.Close, contentDescription = "")
+                            }
+                            Text(
+                                text = if (multiSelectedIds.value.isEmpty()) "" else "${multiSelectedIds.value.size}",
+                                modifier = Modifier.offset(y = (-3).dp),
+                                style = MaterialTheme.typography.headlineSmall
+                            )
                         }
-                    }) {
-                        Icon(
-                            imageVector = if (searchState.value) Icons.Default.Close else Icons.Default.Search,
-                            contentDescription = ""
-                        )
-                    }
-                })
-                else TopAppBar(title = {}, navigationIcon = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    }, actions = {
                         IconButton(onClick = {
-                            multiSelectedIds.value = emptySet()
-                            screenMode.value = MODE.VIEW
+                            editorState.bulkDelete(multiSelectedIds.value.toList())
+                            multiSelectedIds.value = setOf()
                         }) {
-                            Icon(imageVector = Icons.Default.Close, contentDescription = "")
+                            Icon(imageVector = Icons.Default.Delete, contentDescription = "")
                         }
-                        Text(
-                            text = if (multiSelectedIds.value.isEmpty()) "" else "${multiSelectedIds.value.size}",
-                            modifier = Modifier.offset(y = (-3).dp),
-                            style = MaterialTheme.typography.headlineSmall
-                        )
-                    }
-                }, actions = {
-                    IconButton(onClick = {
-                        editorState.bulkDelete(multiSelectedIds.value.toList())
-                        multiSelectedIds.value = setOf()
-                    }) {
-                        Icon(imageVector = Icons.Default.Delete, contentDescription = "")
-                    }
-                })
+                    })
+                }
             },
             floatingActionButton = {
                 FloatingActionButton(
@@ -266,12 +259,9 @@ fun HomeScreen(editorState: EditorState) {
         enter = fadeIn() + slideInHorizontally(),
         exit = fadeOut() + slideOutHorizontally()
     ) {
-        CreationComponent(
-            visibility = showCreation,
-            editorState = editorState,
-            onBackPressed = {
-                showCreation.value = false
-            })
+        CreationComponent(visibility = showCreation, editorState = editorState, onBackPressed = {
+            showCreation.value = false
+        })
     }
 }
 

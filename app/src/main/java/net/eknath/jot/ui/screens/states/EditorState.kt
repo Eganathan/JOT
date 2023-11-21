@@ -1,5 +1,6 @@
 package net.eknath.jot.ui.screens.states
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
