@@ -1,6 +1,5 @@
 package net.eknath.jot.domain.usecase
 
-import net.eknath.jot.domain.model.Note
 import net.eknath.jot.domain.repository.NoteRepository
 import javax.inject.Inject
 

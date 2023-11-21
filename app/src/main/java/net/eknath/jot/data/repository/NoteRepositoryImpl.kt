@@ -1,6 +1,5 @@
 package net.eknath.jot.data.repository
 
-import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import net.eknath.jot.data.local.database.NoteDao

@@ -8,9 +8,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import net.eknath.jot.data.local.database.AppDatabase
-import net.eknath.jot.data.mapper.NoteMapper
-import net.eknath.jot.data.repository.NoteRepositoryImpl
-import net.eknath.jot.domain.repository.NoteRepository
 import javax.inject.Singleton
 
 @Module

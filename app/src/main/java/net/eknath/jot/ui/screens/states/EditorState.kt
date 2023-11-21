@@ -1,12 +1,9 @@
 package net.eknath.jot.ui.screens.states
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.hilt.navigation.compose.hiltViewModel
 import net.eknath.jot.domain.model.Note
-import net.eknath.jot.toDateString
 import net.eknath.jot.ui.screens.NoteViewModel
 
 class EditorState(val viewModel: NoteViewModel) {
