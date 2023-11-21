@@ -85,10 +85,11 @@ fun HomeTopBarSearchComponent(
             )
 
             IconButton(
-                modifier = Modifier.wrapContentWidth(Alignment.End), onClick = onSearchAndClear
+                modifier = Modifier.wrapContentWidth(Alignment.End),
+                onClick = onSearchAndClear
             ) {
                 Icon(
-                    imageVector = if (searchIsFocused.value) Icons.Default.Close else Icons.Default.Search,
+                    imageVector = if (searchIsFocused.value && searchTextField.text.isNotEmpty()) Icons.Default.Close else Icons.Default.Search,
                     contentDescription = ""
                 )
             }
