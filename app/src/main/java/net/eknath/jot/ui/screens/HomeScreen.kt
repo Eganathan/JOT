@@ -177,54 +177,6 @@ fun HomeScreen(editorState: EditorState) {
                             }
 
                         })
-
-                    /*CenterAlignedTopAppBar(modifier = Modifier.shadow(
-                    elevation = 10.dp
-                ), title = {
-                    Text(text = "Jot-Notes+", fontWeight = FontWeight.Medium)
-                }, navigationIcon = {
-                    IconButton(onClick = {
-                        scope.launch {
-                            drawerState.open()
-                        }
-                    }) {
-                        Icon(imageVector = Icons.Default.Menu, contentDescription = "")
-                    }
-                }, actions = {
-                    if (searchState.value) TextField(
-                        value = editorState.searchTextField.value,
-                        onValueChange = {
-                            editorState.searchTextField.value = it
-                            editorState.setSearchQuery()
-                        },
-                        colors = TextFieldDefaults.textFieldColors(
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
-                        ),
-                        singleLine = true,
-                        shape = RoundedCornerShape(25.dp),
-                        modifier = Modifier
-                            .fillMaxWidth(0.85f)
-                            .focusRequester(searchFocusRequester)
-                    )
-
-                    IconButton(onClick = {
-                        if (searchState.value) {
-                            editorState.searchTextField.value = TextFieldValue()
-                            editorState.setSearchQuery()
-                            searchState.value = false
-                        } else {
-                            editorState.searchTextField.value = TextFieldValue()
-                            editorState.setSearchQuery()
-                            searchState.value = true
-                        }
-                    }) {
-                        Icon(
-                            imageVector = if (searchState.value) Icons.Default.Close else Icons.Default.Search,
-                            contentDescription = ""
-                        )
-                    }
-                })*/
                 } else {
                     TopAppBar(title = {}, navigationIcon = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
