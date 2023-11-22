@@ -33,6 +33,6 @@ interface NoteDao {
     suspend fun deleteAllByIds(noteIds: List<Long>)
 
     // Only update title, content, modifiedTimeStamp. Created
-    @Query("UPDATE jots SET title = :title, content = :content, modifiedTimeStamp = :modifiedTimeStamp -- replace with the desired timestamp WHERE id = 1")
-    suspend fun update(title: String, content: String, modifiedTimeStamp: Long)
+    @Query("UPDATE jots SET title = :title, content = :content, modifiedTimeStamp = :modifiedTimeStamp WHERE id =:id")
+    suspend fun update(id: Long, title: String, content: String, modifiedTimeStamp: Long)
 }
