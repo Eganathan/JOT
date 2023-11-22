@@ -7,11 +7,8 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.debounce
@@ -23,8 +20,8 @@ import net.eknath.jot.di.IoDispatcher
 import net.eknath.jot.domain.model.Note
 import net.eknath.jot.domain.repository.NoteRepository
 import net.eknath.jot.domain.usecase.AddNoteUseCase
-import net.eknath.jot.domain.usecase.DeleteNoteUseCase
 import net.eknath.jot.domain.usecase.BulkDeleteUseCase
+import net.eknath.jot.domain.usecase.DeleteNoteUseCase
 import net.eknath.jot.domain.usecase.GetAllNotesUseCase
 import net.eknath.jot.domain.usecase.GetNoteUseCase
 import net.eknath.jot.domain.usecase.SearchNotesUseCase

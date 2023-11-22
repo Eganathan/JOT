@@ -2,7 +2,7 @@ package net.eknath.jot.data.mapper
 
 import net.eknath.jot.data.local.entity.NoteEntity
 import net.eknath.jot.domain.model.Note
-import net.eknath.jot.toDateString
+import java.util.Date
 
 
 class NoteMapper {
@@ -18,7 +18,9 @@ class NoteMapper {
         return NoteEntity(
             id = note.id,
             title = note.title,
-            content = note.content
+            content = note.content,
+            modifiedTimeStamp = System.currentTimeMillis(),
+            createdTimeStamp = System.currentTimeMillis()
         )
     }
 

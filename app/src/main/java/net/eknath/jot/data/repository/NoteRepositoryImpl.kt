@@ -1,6 +1,5 @@
 package net.eknath.jot.data.repository
 
-import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import net.eknath.jot.data.local.database.NoteDao
@@ -38,7 +37,7 @@ class NoteRepositoryImpl @Inject constructor(
 
     override suspend fun update(note: Note) {
         val noteEntity = noteMapper.mapToEntity(note)
-        noteDao.update(noteEntity)
+        noteDao.update(noteEntity.id,noteEntity.title,noteEntity.content,noteEntity.modifiedTimeStamp)
     }
 
     override suspend fun delete(id: Long) {
