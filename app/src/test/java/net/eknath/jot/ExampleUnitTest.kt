@@ -1,4 +1,4 @@
-package net.eknath.jot
+package dev.eknath.jot
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

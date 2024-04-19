@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "net.eknath.jot"
+    namespace = "dev.eknath.jot"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "net.eknath.jot"
+        applicationId = "dev.eknath.jot"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
