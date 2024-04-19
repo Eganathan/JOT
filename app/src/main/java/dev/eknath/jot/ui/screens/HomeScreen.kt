@@ -3,11 +3,14 @@ package dev.eknath.jot.ui.screens
 import DrawerBottomCredits
 import DrawerOptionsContent
 import DrawerTitleContent
+import android.widget.Space
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -49,9 +53,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asFlow
+import dev.eknath.jot.R
 import kotlinx.coroutines.launch
 import dev.eknath.jot.togglePresence
 import dev.eknath.jot.ui.componenets.HomeTopBarSearchComponent
@@ -218,6 +226,11 @@ fun HomeScreen(editorState: EditorState) {
                                 }
                             })
                     }
+
+                    if (notes.isEmpty())
+                        item {
+                            ErrorContent()
+                        }
                 })
         }
     }
@@ -231,6 +244,27 @@ fun HomeScreen(editorState: EditorState) {
         CreationComponent(visibility = showCreation, editorState = editorState, onBackPressed = {
             showCreation.value = false
         })
+    }
+}
+
+@Composable
+private fun ErrorContent() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Spacer(modifier = Modifier.height(100.dp))
+        Image(
+            painter = painterResource(id = R.drawable.error_jot),
+            contentDescription = "",
+            modifier = Modifier.size(200.dp)
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            text = "Empty",
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 
