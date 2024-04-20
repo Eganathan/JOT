@@ -209,7 +209,8 @@ fun HomeScreen(editorState: EditorState) {
                     item { Spacer(modifier = Modifier.height(15.dp)) }
 
                     items(items = sourceNotes.value, key = { note -> note.id }) { note ->
-                        NoteDisplayCard(title = note.title,
+                        NoteDisplayCard(
+                            title = note.title,
                             description = note.content,
                             isSelected = multiSelectedIds.value::contains.invoke(note.id),
                             onLongPress = {

@@ -68,6 +68,10 @@ class EditorState(val viewModel: NoteViewModel) {
         viewModel.deleteNotes(notes = noteIds)
     }
 
+    fun deleteNote(noteId: Long) {
+        viewModel.deleteNoteById(id = noteId)
+    }
+
     fun resetTextFieldAndSelection() {
         titleTextFieldState.value = TextFieldValue()
         entryTextFieldState.value = TextFieldValue()

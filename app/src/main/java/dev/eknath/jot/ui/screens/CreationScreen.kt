@@ -3,17 +3,25 @@
 package dev.eknath.jot.ui.screens
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,9 +44,13 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import dev.eknath.jot.ContextMenuButton
+import dev.eknath.jot.MenuItem
 import dev.eknath.jot.R
+import dev.eknath.jot.readOutLoud
 import dev.eknath.jot.shareNote
 import dev.eknath.jot.ui.screens.states.EditorState
 import dev.eknath.jot.wordCount
@@ -54,7 +66,7 @@ fun CreationComponent(
 ) {
     val context = LocalContext.current
 
-    val selected = remember { mutableStateOf(true) }
+    val confirmationDialog = remember { mutableStateOf(false) }
 
 //    val onToggleSelection = { //todo impl pinnable
 //        selected.value = !selected.value
@@ -74,19 +86,60 @@ fun CreationComponent(
                 IconButton(onClick = onBackPressed) {
                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "")
                 }
-            }, title = {}, actions = {
+            }, title = {},
+                actions = {
 
-                /*IconButton(onClick = onToggleSelection) {
-                    Icon(
-                        imageVector = if (selected.value) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                        contentDescription = ""
+//                   IconButton(onClick = onToggleSelection) {
+//                        Icon(
+//                            imageVector = if (selected.value) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+//                            contentDescription = ""
+//                        )
+//                    }
+//                    IconButton(
+//                        enabled = editorState.entryTextFieldState.value.text.isNotBlank(),
+//                        onClick = {
+//                            readOutLoud(
+//                                context = context,
+//                                noteText = editorState.entryTextFieldState.value.text,
+//                                id = editorState.viewModel.selectedNote.value?.id.toString(),
+//                                onStart = {
+//                                    ttsInProgress.value = true
+//                                },
+//                                onEnd = {
+//                                    ttsInProgress.value = false
+//                                },
+//                                onForceStop = {
+//                                    it.stop()
+//                                    ttsInProgress.value = false
+//                                    it.shutdown()
+//                                }
+//                            )
+//                        }) {
+//                        Image(
+//                            painter = painterResource(id = if (ttsInProgress.value) R.drawable.ic_stop else R.drawable.ic_play),
+//                            contentDescription = ""
+//                        )
+//                    }
+
+//                    IconButton(onClick = onShare) {
+//                        Icon(imageVector = Icons.Default.Share, contentDescription = "")
+//                    }
+
+                    ContextMenuButton(
+                        listOf(
+                            MenuItem(
+                                title = "Share",
+                                onClick = onShare
+                            ),
+                            MenuItem(
+                                title = "Delete",
+                                onClick = {
+                                        confirmationDialog.value = true
+                                }
+                            )
+                        )
                     )
-                }*/
-
-                IconButton(onClick = onShare) {
-                    Icon(imageVector = Icons.Default.Share, contentDescription = "")
-                }
-            })
+                })
         }) {
 
         Column(
@@ -167,6 +220,26 @@ fun CreationComponent(
 
         BackHandler(enabled = true, onBack = onBackPressed)
     }
+
+    AnimatedVisibility(visible = confirmationDialog.value) {
+        ConfirmationDialog(
+            title = "Delete Note",
+            description = "Are you sure you want to delete note?",
+            onDismiss = {
+                confirmationDialog.value = false
+            },
+            onConfirm = {
+                confirmationDialog.value = false
+                editorState.viewModel.selectedNoteId.value?.let {
+                    editorState.deleteNote(it)
+                    onBackPressed()
+                }
+
+            },
+            confirmText = "Delete"
+        )
+    }
+
 
     LaunchedEffect(key1 = editorState.entryTextFieldState, block = {
         focusRequester.requestFocus()
