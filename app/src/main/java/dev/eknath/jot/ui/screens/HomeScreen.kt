@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,6 +31,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
@@ -58,6 +61,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
 import dev.eknath.jot.R
 import kotlinx.coroutines.launch
@@ -92,6 +96,7 @@ fun HomeScreen(editorState: EditorState) {
     }
 
     val screenMode = remember { mutableStateOf(MODE.VIEW) }
+    val confirmationDialog = remember { mutableStateOf(false) }
     val multiSelectedIds = remember { mutableStateOf(setOf<Long>()) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -171,8 +176,7 @@ fun HomeScreen(editorState: EditorState) {
                         }
                     }, actions = {
                         IconButton(onClick = {
-                            editorState.bulkDelete(multiSelectedIds.value.toList())
-                            multiSelectedIds.value = setOf()
+                           confirmationDialog.value = true
                         }) {
                             Icon(imageVector = Icons.Default.Delete, contentDescription = "")
                         }
@@ -245,6 +249,22 @@ fun HomeScreen(editorState: EditorState) {
             showCreation.value = false
         })
     }
+
+    AnimatedVisibility(visible = confirmationDialog.value) {
+        ConfirmationDialog(
+            title = "Delete Multiple notes",
+            description = "Are you sure you want to delete selected ${multiSelectedIds.value.toList().count()} notes?",
+            onDismiss = {
+                confirmationDialog.value = false
+            },
+            onConfirm = {
+                editorState.bulkDelete(multiSelectedIds.value.toList())
+                multiSelectedIds.value = setOf()
+                confirmationDialog.value = false
+            },
+            confirmText = "Delete"
+        )
+    }
 }
 
 @Composable
@@ -265,6 +285,49 @@ private fun ErrorContent() {
             text = "Empty",
             fontWeight = FontWeight.Bold
         )
+    }
+}
+
+@Composable
+fun ConfirmationDialog(
+    title: String,
+    description: String,
+    confirmText: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Card {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.Top
+            ) {
+                Text(
+                    text = title,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(text = description)
+                Spacer(modifier = Modifier.height(15.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    Button(
+                        onClick = onDismiss
+                    ) {
+                        Text(text = "Cancel")
+                    }
+                    Spacer(modifier = Modifier.width(20.dp))
+                    Button(
+                        onClick = onConfirm
+                    ) {
+                        Text(text = confirmText)
+                    }
+                }
+            }
+        }
     }
 }
 

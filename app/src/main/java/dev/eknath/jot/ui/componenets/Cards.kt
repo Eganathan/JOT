@@ -4,11 +4,13 @@ package dev.eknath.jot.ui.componenets
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import dev.eknath.jot.onLongPressDetect
 
 @Composable
@@ -65,13 +68,13 @@ fun NoteDisplayCard(
         {
             if (title.isNotBlank())
                 Text(
-                    text = title,
+                    text = title.trimStart(),
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis
                 )
             Text(
-                text = description,
+                text = description.trimStart(),
                 style = MaterialTheme.typography.bodySmall,
                 maxLines = 10,
                 overflow = TextOverflow.Ellipsis
@@ -79,4 +82,8 @@ fun NoteDisplayCard(
         }
 
     }
+}
+
+fun String.trimStart(): String {
+    return replace("\\s+".toRegex(), "")
 }
