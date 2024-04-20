@@ -79,6 +79,23 @@ fun CreationComponent(
         )
     }
 
+    val textFieldColor = TextFieldDefaults.textFieldColors(
+        containerColor = background,
+
+        disabledIndicatorColor = background,
+        errorIndicatorColor = background,
+        focusedIndicatorColor = background,
+        unfocusedIndicatorColor = background
+    )
+
+    val onValueChange: () -> Unit = {
+        if (editorState.viewModel.selectedNoteId.value == null) {
+            editorState.createJot()
+        } else {
+            editorState.updateJot()
+        }
+    }
+
 
     Scaffold(
         topBar = {
@@ -121,9 +138,15 @@ fun CreationComponent(
 //                        )
 //                    }
 
-//                    IconButton(onClick = onShare) {
-//                        Icon(imageVector = Icons.Default.Share, contentDescription = "")
-//                    }
+                    IconButton(onClick = {
+                        onValueChange()
+                        onBackPressed()
+                    }) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_save),
+                            contentDescription = ""
+                        )
+                    }
 
                     ContextMenuButton(
                         listOf(
@@ -134,7 +157,7 @@ fun CreationComponent(
                             MenuItem(
                                 title = "Delete",
                                 onClick = {
-                                        confirmationDialog.value = true
+                                    confirmationDialog.value = true
                                 }
                             )
                         )
@@ -148,22 +171,6 @@ fun CreationComponent(
                 .fillMaxSize()
                 .imePadding()
         ) {
-            val textFieldColor = TextFieldDefaults.textFieldColors(
-                containerColor = background,
-
-                disabledIndicatorColor = background,
-                errorIndicatorColor = background,
-                focusedIndicatorColor = background,
-                unfocusedIndicatorColor = background
-            )
-
-            val onValueChange: () -> Unit = {
-                if (editorState.viewModel.selectedNoteId.value == null) {
-                    editorState.createJot()
-                } else {
-                    editorState.updateJot()
-                }
-            }
 
             TextField(
                 modifier = Modifier
