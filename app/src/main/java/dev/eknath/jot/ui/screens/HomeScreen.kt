@@ -8,7 +8,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -57,6 +59,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -100,6 +103,7 @@ fun HomeScreen(editorState: EditorState) {
     val multiSelectedIds = remember { mutableStateOf(setOf<Long>()) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val focusRequester = LocalFocusManager.current
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -149,11 +153,12 @@ fun HomeScreen(editorState: EditorState) {
                             searchState.value = true
                             editorState.searchTextField.value = TextFieldValue()
                         },
-                        onSearchAndClear = {
-                            if (editorState.searchTextField.value.text.isEmpty()) {
+                        onSearchAndClear = { isActive ->
+                            if (!isActive) {
                                 searchFocusRequester.requestFocus()
                                 searchState.value = true
                             } else {
+                                focusRequester.clearFocus()
                                 editorState.searchTextField.value = TextFieldValue()
                                 searchState.value = false
                             }
@@ -176,7 +181,7 @@ fun HomeScreen(editorState: EditorState) {
                         }
                     }, actions = {
                         IconButton(onClick = {
-                           confirmationDialog.value = true
+                            confirmationDialog.value = true
                         }) {
                             Icon(imageVector = Icons.Default.Delete, contentDescription = "")
                         }
@@ -243,7 +248,7 @@ fun HomeScreen(editorState: EditorState) {
     AnimatedVisibility(
         visible = showCreation.value,
         enter = fadeIn() + slideInHorizontally(),
-        exit = fadeOut() + slideOutHorizontally()
+        exit = fadeOut()
     ) {
         CreationComponent(visibility = showCreation, editorState = editorState, onBackPressed = {
             showCreation.value = false
@@ -253,7 +258,9 @@ fun HomeScreen(editorState: EditorState) {
     AnimatedVisibility(visible = confirmationDialog.value) {
         ConfirmationDialog(
             title = "Delete Multiple notes",
-            description = "Are you sure you want to delete selected ${multiSelectedIds.value.toList().count()} notes?",
+            description = "Are you sure you want to delete selected ${
+                multiSelectedIds.value.toList().count()
+            } notes?",
             onDismiss = {
                 confirmationDialog.value = false
             },

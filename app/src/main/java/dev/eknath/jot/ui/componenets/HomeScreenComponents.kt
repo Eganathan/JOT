@@ -48,7 +48,7 @@ fun HomeTopBarSearchComponent(
     focusRequester: FocusRequester,
     onOptionsClick: () -> Unit,
     onSearchFocused: () -> Unit,
-    onSearchAndClear: () -> Unit = {},
+    onSearchAndClear: (Boolean) -> Unit = {},
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceVariant
 ) {
 
@@ -86,10 +86,10 @@ fun HomeTopBarSearchComponent(
 
             IconButton(
                 modifier = Modifier.wrapContentWidth(Alignment.End),
-                onClick = onSearchAndClear
+                onClick = { onSearchAndClear(searchIsFocused.value) }
             ) {
                 Icon(
-                    imageVector = if (searchIsFocused.value && searchTextField.text.isNotEmpty()) Icons.Default.Close else Icons.Default.Search,
+                    imageVector = if (searchIsFocused.value) Icons.Default.Close else Icons.Default.Search,
                     contentDescription = ""
                 )
             }
