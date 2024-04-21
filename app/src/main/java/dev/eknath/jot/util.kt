@@ -2,45 +2,49 @@ package dev.eknath.jot
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.input.TextFieldValue
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import android.os.Build
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import android.speech.tts.TextToSpeech
-import androidx.annotation.RequiresApi
+import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import dev.eknath.jot.ui.constants.JOTColors
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 // A Helper function that enables the user to share his notes
 fun Context.shareNote(title: String, content: String) {
@@ -137,17 +141,29 @@ fun readOutLoud(
 
 //Menu
 @Stable
-data class MenuItem(val title: String, val onClick: () -> Unit)
+data class MenuItem(val iconRes: Int, val title: String, val onClick: () -> Unit)
 
 @Composable
 private fun MenuItem(menuItem: MenuItem) {
-    Text(
-        text = menuItem.title,
+    Row(
         modifier = Modifier
-            .clickable(onClick = menuItem.onClick)
             .fillMaxWidth()
-            .padding(start = 20.dp, end = 20.dp, bottom = 10.dp)
-    )
+            .clickable(onClick = menuItem.onClick)
+    ) {
+        Spacer(modifier = Modifier.width(10.dp))
+        Icon(
+            painter = painterResource(id = menuItem.iconRes), contentDescription = menuItem.title,
+            modifier = Modifier
+                .size(25.dp)
+                .offset(y = 3.dp)
+        )
+        Spacer(modifier = Modifier.width(5.dp))
+        Text(
+            text = menuItem.title,
+            modifier = Modifier
+                .padding(end = 20.dp, bottom = 10.dp),
+        )
+    }
 }
 
 @Composable
@@ -156,7 +172,10 @@ fun ContextMenuButton(menuItems: List<MenuItem>) {
     val isOpen by remember { derivedStateOf { state } }
 
     IconButton(onClick = { state = !state }) {
-        Icon(Icons.Filled.MoreVert, contentDescription = "More options")
+        Icon(
+            Icons.Filled.MoreVert, contentDescription = "More options",
+            tint = MaterialTheme.colorScheme.onBackground
+        )
     }
 
     DropdownMenu(
@@ -166,5 +185,65 @@ fun ContextMenuButton(menuItems: List<MenuItem>) {
         menuItems.forEach { item ->
             MenuItem(item)
         }
+    }
+}
+
+//vertical Selection
+@Composable
+fun ColorsSelectors(selectedJotColor: JOTColors) {
+    var state by remember { mutableStateOf(false) }
+    val isOpen by remember { derivedStateOf { state } }
+    val isDarkTheme = isSystemInDarkTheme()
+
+    IconButton(onClick = { state = !state }) {
+        Card(
+            modifier = Modifier
+                .size(35.dp)
+                .clip(CircleShape),
+            colors = CardDefaults.cardColors(if (isDarkTheme) selectedJotColor.dark else selectedJotColor.light)
+        ) {}
+    }
+
+    if (isOpen)
+        Dialog(onDismissRequest = { state = false }) {
+            Card(
+                modifier = Modifier
+                    .padding(20.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(text = "Choose a color:")
+                Row(modifier = Modifier.padding(vertical = 5.dp)) {
+                    JOTColors.entries.forEach {
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Card(
+                            modifier = Modifier
+                                .size(50.dp),
+                            shape = RectangleShape,
+                            border = BorderStroke(width = 2.dp, color = Color.Red),
+                            colors = CardDefaults.cardColors(if (isDarkTheme) it.dark else it.light)
+                        ) {}
+                        Spacer(modifier = Modifier.width(5.dp))
+                    }
+                }
+            }
+        }
+}
+
+fun Long.getDate(): String {
+    if (this == 0L) return ""
+
+    val date = Date(this)
+    val formatter = SimpleDateFormat("dd-MM-yyyy")
+    return formatter.format(date)
+}
+
+fun String.toLongTimestamp(): Long {
+    val format = SimpleDateFormat("dd-MM-yyyy") // Assuming the same format used for conversion
+    try {
+        val date = format.parse(this)
+        return date?.time ?: 0L // Return 0L if parsing fails
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return 0L // Handle parsing exceptions (optional)
     }
 }

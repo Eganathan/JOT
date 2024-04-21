@@ -2,6 +2,8 @@ package dev.eknath.jot.data.mapper
 
 import dev.eknath.jot.data.local.entity.NoteEntity
 import dev.eknath.jot.domain.model.Note
+import dev.eknath.jot.getDate
+import dev.eknath.jot.toLongTimestamp
 import java.util.Date
 
 
@@ -11,6 +13,8 @@ class NoteMapper {
             id = entity.id,
             title = entity.title,
             content = entity.content,
+            createdDate = entity.createdTimeStamp.getDate(),
+            lastModifiedDate = entity.modifiedTimeStamp.getDate()
         )
     }
 
@@ -19,8 +23,8 @@ class NoteMapper {
             id = note.id,
             title = note.title,
             content = note.content,
-            modifiedTimeStamp = System.currentTimeMillis(),
-            createdTimeStamp = System.currentTimeMillis()
+            modifiedTimeStamp = note.lastModifiedDate.toLongTimestamp(),
+            createdTimeStamp = note.createdDate.toLongTimestamp()
         )
     }
 

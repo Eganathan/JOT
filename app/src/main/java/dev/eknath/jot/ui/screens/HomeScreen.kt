@@ -212,6 +212,8 @@ fun HomeScreen(editorState: EditorState) {
                         NoteDisplayCard(
                             title = note.title,
                             description = note.content,
+                            createdTime = note.createdDate,
+                            modifiedTime = note.lastModifiedDate,
                             isSelected = multiSelectedIds.value::contains.invoke(note.id),
                             onLongPress = {
                                 screenMode.value = MODE.SELECTION

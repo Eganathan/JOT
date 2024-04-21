@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import dev.eknath.jot.domain.model.Note
+import dev.eknath.jot.getDate
 import dev.eknath.jot.ui.screens.NoteViewModel
 
 class EditorState(val viewModel: NoteViewModel) {
@@ -17,7 +18,9 @@ class EditorState(val viewModel: NoteViewModel) {
             viewModel.addNote(
                 note = Note(
                     title = titleTextFieldState.value.text,
-                    content = entryTextFieldState.value.text
+                    content = entryTextFieldState.value.text,
+                    createdDate = System.currentTimeMillis().getDate(),
+                    lastModifiedDate = System.currentTimeMillis().getDate()
                 )
             )
         }
@@ -55,7 +58,9 @@ class EditorState(val viewModel: NoteViewModel) {
                     Note(
                         id = it,
                         title = titleTextFieldState.value.text,
-                        content = entryTextFieldState.value.text
+                        content = entryTextFieldState.value.text,
+                        createdDate = viewModel.selectedNote.value?.createdDate ?: "0L",
+                        lastModifiedDate = System.currentTimeMillis().getDate()
                     )
                 )
             } else {

@@ -2,10 +2,13 @@
 
 package dev.eknath.jot.ui.screens
 
+import android.provider.CalendarContract.Colors
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -13,8 +16,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
@@ -35,11 +41,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -47,11 +56,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import dev.eknath.jot.ColorsSelectors
 import dev.eknath.jot.ContextMenuButton
 import dev.eknath.jot.MenuItem
 import dev.eknath.jot.R
 import dev.eknath.jot.readOutLoud
 import dev.eknath.jot.shareNote
+import dev.eknath.jot.ui.constants.JOTColors
 import dev.eknath.jot.ui.screens.states.EditorState
 import dev.eknath.jot.wordCount
 
@@ -67,6 +78,11 @@ fun CreationComponent(
     val context = LocalContext.current
 
     val confirmationDialog = remember { mutableStateOf(false) }
+    val isStarred = remember { mutableStateOf(false) }
+
+    val isDarkTheme = isSystemInDarkTheme()
+    var selectedColor =
+        MaterialTheme.colorScheme.background //by remember { mutableStateOf(if (isDarkTheme) JOTColors.GREEN.dark else JOTColors.GREEN.light) }
 
 //    val onToggleSelection = { //todo impl pinnable
 //        selected.value = !selected.value
@@ -80,12 +96,12 @@ fun CreationComponent(
     }
 
     val textFieldColor = TextFieldDefaults.textFieldColors(
-        containerColor = background,
+        containerColor = selectedColor,
 
-        disabledIndicatorColor = background,
-        errorIndicatorColor = background,
-        focusedIndicatorColor = background,
-        unfocusedIndicatorColor = background
+        disabledIndicatorColor = selectedColor,
+        errorIndicatorColor = selectedColor,
+        focusedIndicatorColor = selectedColor,
+        unfocusedIndicatorColor = selectedColor
     )
 
     val onValueChange: () -> Unit = {
@@ -112,49 +128,78 @@ fun CreationComponent(
 //                            contentDescription = ""
 //                        )
 //                    }
+                    IconButton(
+                        enabled = editorState.entryTextFieldState.value.text.isNotBlank(),
+                        onClick = {
+                            readOutLoud(
+                                context = context,
+                                noteText = editorState.entryTextFieldState.value.text,
+                                id = editorState.viewModel.selectedNote.value?.id.toString(),
+                                onStart = {
+                                },
+                                onEnd = {
+                                },
+                                onForceStop = {
+                                    it.stop()
+                                    it.shutdown()
+                                }
+                            )
+                        }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_play),
+                            contentDescription = "",
+                            tint = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
 //                    IconButton(
-//                        enabled = editorState.entryTextFieldState.value.text.isNotBlank(),
 //                        onClick = {
-//                            readOutLoud(
-//                                context = context,
-//                                noteText = editorState.entryTextFieldState.value.text,
-//                                id = editorState.viewModel.selectedNote.value?.id.toString(),
-//                                onStart = {
-//                                    ttsInProgress.value = true
-//                                },
-//                                onEnd = {
-//                                    ttsInProgress.value = false
-//                                },
-//                                onForceStop = {
-//                                    it.stop()
-//                                    ttsInProgress.value = false
-//                                    it.shutdown()
-//                                }
-//                            )
+//
 //                        }) {
-//                        Image(
-//                            painter = painterResource(id = if (ttsInProgress.value) R.drawable.ic_stop else R.drawable.ic_play),
-//                            contentDescription = ""
-//                        )
+//                        Card(
+//                            modifier = Modifier
+//                                .size(35.dp)
+//                                .clip(CircleShape),
+//                            colors = CardDefaults.cardColors(selectedColor)
+//                        ) {}
 //                    }
 
-                    IconButton(onClick = {
-                        onValueChange()
-                        onBackPressed()
-                    }) {
-                        Image(
+//                    ColorsSelectors(selectedJotColor = JOTColors.GREEN)
+
+                    IconButton(
+                        onClick = {
+                            isStarred.value = !isStarred.value
+                        }) {
+                        Icon(
+                            painter = painterResource(id = if (isStarred.value) R.drawable.ic_selected else R.drawable.ic_unselected_star),
+                            contentDescription = "",
+                            modifier = Modifier.size(25.dp),
+                            tint = MaterialTheme.colorScheme.onBackground
+                        )
+                    }
+
+                    IconButton(
+                        onClick = {
+                            onValueChange()
+                            onBackPressed()
+                        }) {
+                        Icon(
                             painter = painterResource(id = R.drawable.ic_save),
-                            contentDescription = ""
+                            contentDescription = "",
+                            modifier = Modifier.size(25.dp),
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
 
                     ContextMenuButton(
                         listOf(
                             MenuItem(
+                                iconRes = R.drawable.ic_share,
                                 title = "Share",
                                 onClick = onShare
                             ),
                             MenuItem(
+                                iconRes = R.drawable.ic_delete,
                                 title = "Delete",
                                 onClick = {
                                     confirmationDialog.value = true
@@ -163,13 +208,16 @@ fun CreationComponent(
                         )
                     )
                 })
-        }) {
+        },
+        containerColor = selectedColor
+    ) {
 
         Column(
             modifier = Modifier
                 .padding(it)
                 .fillMaxSize()
-                .imePadding()
+                .imePadding(),
+            verticalArrangement = Arrangement.Top
         ) {
 
             TextField(
@@ -189,24 +237,12 @@ fun CreationComponent(
                     )
                 },
                 colors = textFieldColor,
-                textStyle = MaterialTheme.typography.titleLarge
+                textStyle = MaterialTheme.typography.titleLarge,
             )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.tertiaryContainer),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "${editorState.entryTextFieldState.value.wordCount()} Words",
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier
-                        .padding(start = 25.dp)
-                        .padding(vertical = 5.dp)
-                )
-            }
+
             TextField(
                 modifier = Modifier
+                    .offset(y = (-17).dp)
                     .fillMaxSize()
                     .focusRequester(focusRequester),
                 value = editorState.entryTextFieldState.value,

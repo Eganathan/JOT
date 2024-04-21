@@ -63,6 +63,7 @@ class NoteViewModel @Inject constructor(
 
     fun addNote(note: Note) = viewModelScope.launch {
         selectedNoteId.value = addNoteUseCase(note)
+        getNoteById(selectedNoteId.value!!)
     }
 
     fun getNoteById(id: Long) = viewModelScope.launch {
