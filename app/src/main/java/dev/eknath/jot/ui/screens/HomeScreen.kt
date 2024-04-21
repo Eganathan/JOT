@@ -11,6 +11,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +29,9 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -71,13 +75,14 @@ import kotlinx.coroutines.launch
 import dev.eknath.jot.togglePresence
 import dev.eknath.jot.ui.componenets.HomeTopBarSearchComponent
 import dev.eknath.jot.ui.componenets.NoteDisplayCard
+import dev.eknath.jot.ui.componenets.NoteDisplayGridCard
 import dev.eknath.jot.ui.screens.states.EditorState
 
 enum class MODE {
     VIEW, SELECTION;
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(editorState: EditorState) {
 
@@ -97,6 +102,8 @@ fun HomeScreen(editorState: EditorState) {
             }
         }
     }
+
+    val useGridLayout = remember { mutableStateOf(false) }
 
     val screenMode = remember { mutableStateOf(MODE.VIEW) }
     val confirmationDialog = remember { mutableStateOf(false) }
@@ -129,8 +136,7 @@ fun HomeScreen(editorState: EditorState) {
         },
     ) {
         Scaffold(
-            modifier = Modifier
-                .statusBarsPadding(),
+            modifier = Modifier.statusBarsPadding(),
             topBar = {
                 if (multiSelectedIds.value.isEmpty()) {
                     HomeTopBarSearchComponent( //todo need to look at this again too many parms
@@ -200,80 +206,147 @@ fun HomeScreen(editorState: EditorState) {
             },
             floatingActionButtonPosition = FabPosition.End,
         ) {
-            LazyColumn(modifier = Modifier
-                .padding(it)
-                .padding(horizontal = 10.dp)
-                .fillMaxSize(),
-                contentPadding = PaddingValues(5.dp),
-                content = {
-                    item { Spacer(modifier = Modifier.height(15.dp)) }
 
-                    items(items = sourceNotes.value, key = { note -> note.id }) { note ->
-                        NoteDisplayCard(
-                            title = note.title,
-                            description = note.content,
-                            createdTime = note.createdDate,
-                            modifiedTime = note.lastModifiedDate,
-                            isSelected = multiSelectedIds.value::contains.invoke(note.id),
-                            onLongPress = {
-                                screenMode.value = MODE.SELECTION
-                                multiSelectedIds.value = multiSelectedIds.value.plus(note.id)
-                            },
-                            onTap = {
-                                when (screenMode.value) {
-                                    MODE.VIEW -> {
-                                        editorState.getJot(id = note.id,
-                                            onSuccess = { showCreation.value = true },
-                                            onFailure = {
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .padding(it)) {
+//                Row(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(horizontal = 10.dp, vertical = 10.dp),
+//                    horizontalArrangement = Arrangement.End
+//                ) {
+//                    IconButton(onClick = {
+//                        useGridLayout.value = !useGridLayout.value
+//                    }) {
+//                        Icon(
+//                            painter = painterResource(id = if (useGridLayout.value) R.drawable.ic_list else R.drawable.ic_grid),
+//                            contentDescription = null,
+//                            tint = MaterialTheme.colorScheme.onBackground,
+//                            modifier = Modifier.size(30.dp)
+//                        )
+//                    }
+//                }
 
-                                            })
+                if (useGridLayout.value)
+                    LazyVerticalStaggeredGrid(
+                        modifier = Modifier
+                            .padding(top = 20.dp)
+                            .padding(horizontal = 10.dp)
+                            .fillMaxSize(),
+                        columns = StaggeredGridCells.Fixed(2),
+                        verticalItemSpacing = 5.dp,
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
+                    ) {
+
+                        items(items = sourceNotes.value, key = { note -> note.id }) { note ->
+                            NoteDisplayGridCard(title = note.title,
+                                description = note.content,
+                                createdTime = note.createdDate,
+                                modifiedTime = note.lastModifiedDate,
+                                isSelected = multiSelectedIds.value::contains.invoke(note.id),
+                                onLongPress = {
+                                    screenMode.value = MODE.SELECTION
+                                    multiSelectedIds.value = multiSelectedIds.value.plus(note.id)
+                                },
+                                onTap = {
+                                    when (screenMode.value) {
+                                        MODE.VIEW -> {
+                                            editorState.getJot(id = note.id,
+                                                onSuccess = { showCreation.value = true },
+                                                onFailure = {
+
+                                                })
+                                        }
+
+                                        MODE.SELECTION -> {
+                                            multiSelectedIds.value =
+                                                multiSelectedIds.value.togglePresence(note.id)
+                                            if (multiSelectedIds.value.isEmpty()) screenMode.value =
+                                                MODE.VIEW
+                                        }
                                     }
-
-                                    MODE.SELECTION -> {
-                                        multiSelectedIds.value =
-                                            multiSelectedIds.value.togglePresence(note.id)
-                                        if (multiSelectedIds.value.isEmpty()) screenMode.value =
-                                            MODE.VIEW
-                                    }
-                                }
-                            })
-                    }
-
-                    if (notes.isEmpty())
-                        item {
-                            ErrorContent()
+                                })
                         }
+
+                    }
+                else
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(horizontal = 10.dp)
+                            .fillMaxSize(),
+                        contentPadding = PaddingValues(5.dp),
+                        content = {
+                            item { Spacer(modifier = Modifier.height(15.dp)) }
+
+                            items(items = sourceNotes.value, key = { note -> note.id }) { note ->
+                                NoteDisplayCard(
+                                    title = note.title,
+                                    description = note.content,
+                                    createdTime = note.createdDate,
+                                    modifiedTime = note.lastModifiedDate,
+                                    isSelected = multiSelectedIds.value::contains.invoke(note.id),
+                                    onLongPress = {
+                                        screenMode.value = MODE.SELECTION
+                                        multiSelectedIds.value =
+                                            multiSelectedIds.value.plus(note.id)
+                                    },
+                                    onTap = {
+                                        when (screenMode.value) {
+                                            MODE.VIEW -> {
+                                                editorState.getJot(id = note.id,
+                                                    onSuccess = { showCreation.value = true },
+                                                    onFailure = {
+
+                                                    })
+                                            }
+
+                                            MODE.SELECTION -> {
+                                                multiSelectedIds.value =
+                                                    multiSelectedIds.value.togglePresence(note.id)
+                                                if (multiSelectedIds.value.isEmpty()) screenMode.value =
+                                                    MODE.VIEW
+                                            }
+                                        }
+                                    })
+                            }
+
+                            if (notes.isEmpty())
+                                item {
+                                    ErrorContent()
+                                }
+                        })
+            }
+        }
+
+        //CreationComponent
+        AnimatedVisibility(
+            visible = showCreation.value, enter = fadeIn() + slideInHorizontally(), exit = fadeOut()
+        ) {
+            CreationComponent(visibility = showCreation,
+                editorState = editorState,
+                onBackPressed = {
+                    showCreation.value = false
                 })
         }
-    }
 
-    //CreationComponent
-    AnimatedVisibility(
-        visible = showCreation.value,
-        enter = fadeIn() + slideInHorizontally(),
-        exit = fadeOut()
-    ) {
-        CreationComponent(visibility = showCreation, editorState = editorState, onBackPressed = {
-            showCreation.value = false
-        })
-    }
-
-    AnimatedVisibility(visible = confirmationDialog.value) {
-        ConfirmationDialog(
-            title = "Delete Multiple notes",
-            description = "Are you sure you want to delete selected ${
-                multiSelectedIds.value.toList().count()
-            } notes?",
-            onDismiss = {
-                confirmationDialog.value = false
-            },
-            onConfirm = {
-                editorState.bulkDelete(multiSelectedIds.value.toList())
-                multiSelectedIds.value = setOf()
-                confirmationDialog.value = false
-            },
-            confirmText = "Delete"
-        )
+        AnimatedVisibility(visible = confirmationDialog.value) {
+            ConfirmationDialog(
+                title = "Delete Multiple notes",
+                description = "Are you sure you want to delete selected ${
+                    multiSelectedIds.value.toList().count()
+                } notes?",
+                onDismiss = {
+                    confirmationDialog.value = false
+                },
+                onConfirm = {
+                    editorState.bulkDelete(multiSelectedIds.value.toList())
+                    multiSelectedIds.value = setOf()
+                    confirmationDialog.value = false
+                },
+                confirmText = "Delete"
+            )
+        }
     }
 }
 
@@ -292,8 +365,7 @@ private fun ErrorContent() {
         )
         Spacer(modifier = Modifier.height(10.dp))
         Text(
-            text = "Empty",
-            fontWeight = FontWeight.Bold
+            text = "Empty", fontWeight = FontWeight.Bold
         )
     }
 }
@@ -309,12 +381,10 @@ fun ConfirmationDialog(
     Dialog(onDismissRequest = onDismiss) {
         Card {
             Column(
-                modifier = Modifier.padding(20.dp),
-                verticalArrangement = Arrangement.Top
+                modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.Top
             ) {
                 Text(
-                    text = title,
-                    fontWeight = FontWeight.Bold
+                    text = title, fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(text = description)
