@@ -45,6 +45,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,6 +67,8 @@ import dev.eknath.jot.shareNote
 import dev.eknath.jot.ui.constants.JOTColors
 import dev.eknath.jot.ui.screens.states.EditorState
 import dev.eknath.jot.wordCount
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,6 +80,8 @@ fun CreationComponent(
     focusRequester: FocusRequester = FocusRequester()
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var lastJob: Job? = null
 
     val confirmationDialog = remember { mutableStateOf(false) }
     val isFavourite by remember { derivedStateOf { editorState.isFavorite.value } }
@@ -103,10 +108,13 @@ fun CreationComponent(
     )
 
     val onValueChange: () -> Unit = {
-        if (editorState.viewModel.selectedNoteId.value == null) {
-            editorState.createJot()
-        } else {
-            editorState.updateJot()
+        lastJob?.cancel()
+        lastJob = scope.launch {
+            if (editorState.viewModel.selectedNoteId.value == null) {
+                editorState.createJot()
+            } else {
+                editorState.updateJot()
+            }
         }
     }
 
