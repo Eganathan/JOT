@@ -6,4 +6,7 @@
 
     <string name="word_count">Word Count:</string>
     <string name="made_with_love">Words</string>
+
+    <string name="empty_note_title" translatable="false">Create your first note!</string>
+    <string name="empty_note_description" translatable="false">You can get started by clicking the + button and start jotting down..</string>
 </resources>

@@ -15,6 +15,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -39,6 +40,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
@@ -65,8 +67,10 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
@@ -91,7 +95,7 @@ fun HomeScreen(editorState: EditorState) {
     val searchFocusRequester = FocusRequester()
 
 
-    val notes by editorState.viewModel.notes.asFlow().collectAsState(initial = emptyList())
+    val notes by editorState.viewModel.notes.asFlow().collectAsState(initial = null)
     val searchedNotes by editorState.viewModel.searchResults.collectAsState(initial = emptyList())
 
     val sourceNotes = remember {
@@ -135,82 +139,96 @@ fun HomeScreen(editorState: EditorState) {
             }
         },
     ) {
-        Scaffold(
-            modifier = Modifier.statusBarsPadding(),
-            topBar = {
-                if (multiSelectedIds.value.isEmpty()) {
-                    HomeTopBarSearchComponent( //todo need to look at this again too many parms
-                        modifier = Modifier
-                            .padding(horizontal = 10.dp)
-                            .padding(top = 20.dp),
-                        searchTextField = editorState.searchTextField.value,
-                        onValueChanged = {
-                            searchState.value = true
-                            editorState.searchTextField.value = it
-                            editorState.setSearchQuery()
-                        },
-                        onOptionsClick = {
-                            scope.launch {
-                                drawerState.open()
-                            }
-                        },
-                        focusRequester = searchFocusRequester,
-                        onSearchFocused = {
-                            searchState.value = true
-                            editorState.searchTextField.value = TextFieldValue()
-                        },
-                        onSearchAndClear = { isActive ->
-                            if (!isActive) {
-                                searchFocusRequester.requestFocus()
+
+        if (sourceNotes.value == null) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(300.dp)
+                )
+                Text(text = "Loading Jots....", modifier = Modifier.align(Alignment.Center))
+
+            }
+        } else
+            Scaffold(
+                modifier = Modifier.statusBarsPadding(),
+                topBar = {
+                    if (multiSelectedIds.value.isEmpty()) {
+                        HomeTopBarSearchComponent( //todo need to look at this again too many parms
+                            modifier = Modifier
+                                .padding(horizontal = 10.dp)
+                                .padding(top = 20.dp),
+                            searchTextField = editorState.searchTextField.value,
+                            onValueChanged = {
                                 searchState.value = true
-                            } else {
-                                focusRequester.clearFocus()
+                                editorState.searchTextField.value = it
+                                editorState.setSearchQuery()
+                            },
+                            onOptionsClick = {
+                                scope.launch {
+                                    drawerState.open()
+                                }
+                            },
+                            focusRequester = searchFocusRequester,
+                            onSearchFocused = {
+                                searchState.value = true
                                 editorState.searchTextField.value = TextFieldValue()
-                                searchState.value = false
-                            }
+                            },
+                            onSearchAndClear = { isActive ->
+                                if (!isActive) {
+                                    searchFocusRequester.requestFocus()
+                                    searchState.value = true
+                                } else {
+                                    focusRequester.clearFocus()
+                                    editorState.searchTextField.value = TextFieldValue()
+                                    searchState.value = false
+                                }
 
-                        })
-                } else {
-                    TopAppBar(title = {}, navigationIcon = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            })
+                    } else {
+                        TopAppBar(title = {}, navigationIcon = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                IconButton(onClick = {
+                                    multiSelectedIds.value = emptySet()
+                                    screenMode.value = MODE.VIEW
+                                }) {
+                                    Icon(imageVector = Icons.Default.Close, contentDescription = "")
+                                }
+                                Text(
+                                    text = if (multiSelectedIds.value.isEmpty()) "" else "${multiSelectedIds.value.size}",
+                                    modifier = Modifier.offset(y = (-3).dp),
+                                    style = MaterialTheme.typography.headlineSmall
+                                )
+                            }
+                        }, actions = {
                             IconButton(onClick = {
-                                multiSelectedIds.value = emptySet()
-                                screenMode.value = MODE.VIEW
+                                confirmationDialog.value = true
                             }) {
-                                Icon(imageVector = Icons.Default.Close, contentDescription = "")
+                                Icon(imageVector = Icons.Default.Delete, contentDescription = "")
                             }
-                            Text(
-                                text = if (multiSelectedIds.value.isEmpty()) "" else "${multiSelectedIds.value.size}",
-                                modifier = Modifier.offset(y = (-3).dp),
-                                style = MaterialTheme.typography.headlineSmall
-                            )
-                        }
-                    }, actions = {
-                        IconButton(onClick = {
-                            confirmationDialog.value = true
-                        }) {
-                            Icon(imageVector = Icons.Default.Delete, contentDescription = "")
-                        }
-                    })
-                }
-            },
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = {
-                        editorState.resetTextFieldAndSelection()
-                        showCreation.value = true
-                    }, shape = RoundedCornerShape(10.dp)
-                ) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "")
-                }
-            },
-            floatingActionButtonPosition = FabPosition.End,
-        ) {
+                        })
+                    }
+                },
+                floatingActionButton = {
+                    FloatingActionButton(
+                        onClick = {
+                            editorState.resetTextFieldAndSelection()
+                            showCreation.value = true
+                        }, shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Icon(imageVector = Icons.Default.Add, contentDescription = "")
+                    }
+                },
+                floatingActionButtonPosition = FabPosition.End,
+            ) {
 
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .padding(it)) {
-                //Switches from LIST to GRID View vise versa
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(it)
+                ) {
+                    //Switches from LIST to GRID View vise versa
 //                Row(
 //                    modifier = Modifier
 //                        .fillMaxWidth()
@@ -229,60 +247,20 @@ fun HomeScreen(editorState: EditorState) {
 //                    }
 //                }
 
-                if (useGridLayout.value)
-                    LazyVerticalStaggeredGrid(
-                        modifier = Modifier
-                            .padding(top = 20.dp)
-                            .padding(horizontal = 10.dp)
-                            .fillMaxSize(),
-                        columns = StaggeredGridCells.Fixed(2),
-                        verticalItemSpacing = 5.dp,
-                        horizontalArrangement = Arrangement.spacedBy(5.dp),
-                    ) {
-
-                        items(items = sourceNotes.value, key = { note -> note.id }) { note ->
-                            NoteDisplayGridCard(title = note.title,
-                                description = note.content,
-                                createdTime = note.createdDate,
-                                modifiedTime = note.lastModifiedDate,
-                                isSelected = multiSelectedIds.value::contains.invoke(note.id),
-                                onLongPress = {
-                                    screenMode.value = MODE.SELECTION
-                                    multiSelectedIds.value = multiSelectedIds.value.plus(note.id)
-                                },
-                                onTap = {
-                                    when (screenMode.value) {
-                                        MODE.VIEW -> {
-                                            editorState.getJot(id = note.id,
-                                                onSuccess = { showCreation.value = true },
-                                                onFailure = {
-
-                                                })
-                                        }
-
-                                        MODE.SELECTION -> {
-                                            multiSelectedIds.value =
-                                                multiSelectedIds.value.togglePresence(note.id)
-                                            if (multiSelectedIds.value.isEmpty()) screenMode.value =
-                                                MODE.VIEW
-                                        }
-                                    }
-                                })
-                        }
-
-                    }
-                else
-                    LazyColumn(
-                        modifier = Modifier
-                            .padding(horizontal = 10.dp)
-                            .fillMaxSize(),
-                        contentPadding = PaddingValues(5.dp),
-                        content = {
-                            item { Spacer(modifier = Modifier.height(15.dp)) }
-
-                            items(items = sourceNotes.value, key = { note -> note.id }) { note ->
-                                NoteDisplayCard(
-                                    title = note.title,
+                    if (useGridLayout.value)
+                        LazyVerticalStaggeredGrid(
+                            modifier = Modifier
+                                .padding(top = 20.dp)
+                                .padding(horizontal = 10.dp)
+                                .fillMaxSize(),
+                            columns = StaggeredGridCells.Fixed(2),
+                            verticalItemSpacing = 5.dp,
+                            horizontalArrangement = Arrangement.spacedBy(5.dp),
+                        ) {
+                            items(
+                                items = sourceNotes.value.orEmpty(),
+                                key = { note -> note.id }) { note ->
+                                NoteDisplayGridCard(title = note.title,
                                     description = note.content,
                                     createdTime = note.createdDate,
                                     modifiedTime = note.lastModifiedDate,
@@ -312,13 +290,57 @@ fun HomeScreen(editorState: EditorState) {
                                     })
                             }
 
-                            if (notes.isEmpty())
-                                item {
-                                    ErrorContent()
+                        }
+                    else
+                        LazyColumn(
+                            modifier = Modifier
+                                .padding(horizontal = 10.dp)
+                                .fillMaxSize(),
+                            contentPadding = PaddingValues(5.dp),
+                            content = {
+                                item { Spacer(modifier = Modifier.height(15.dp)) }
+
+                                items(
+                                    items = sourceNotes.value.orEmpty(),
+                                    key = { note -> note.id }) { note ->
+                                    NoteDisplayCard(
+                                        title = note.title,
+                                        description = note.content,
+                                        createdTime = note.createdDate,
+                                        modifiedTime = note.lastModifiedDate,
+                                        isSelected = multiSelectedIds.value::contains.invoke(note.id),
+                                        onLongPress = {
+                                            screenMode.value = MODE.SELECTION
+                                            multiSelectedIds.value =
+                                                multiSelectedIds.value.plus(note.id)
+                                        },
+                                        onTap = {
+                                            when (screenMode.value) {
+                                                MODE.VIEW -> {
+                                                    editorState.getJot(id = note.id,
+                                                        onSuccess = { showCreation.value = true },
+                                                        onFailure = {
+
+                                                        })
+                                                }
+
+                                                MODE.SELECTION -> {
+                                                    multiSelectedIds.value =
+                                                        multiSelectedIds.value.togglePresence(note.id)
+                                                    if (multiSelectedIds.value.isEmpty()) screenMode.value =
+                                                        MODE.VIEW
+                                                }
+                                            }
+                                        })
                                 }
-                        })
+
+                                if (notes?.isEmpty() == true)
+                                    item {
+                                        ErrorContent()
+                                    }
+                            })
+                }
             }
-        }
 
         //CreationComponent
         AnimatedVisibility(
@@ -360,13 +382,16 @@ private fun ErrorContent() {
     ) {
         Spacer(modifier = Modifier.height(100.dp))
         Image(
-            painter = painterResource(id = R.drawable.error_jot),
-            contentDescription = "",
-            modifier = Modifier.size(200.dp)
+            painter = painterResource(id = R.drawable.ic_empty),
+            contentDescription = ""
         )
         Spacer(modifier = Modifier.height(10.dp))
+        Text(text = stringResource(id = R.string.empty_note_title), fontWeight = FontWeight.Bold)
         Text(
-            text = "Empty", fontWeight = FontWeight.Bold
+            text = stringResource(id = R.string.empty_note_description),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(top = 5.dp, start = 30.dp, end = 30.dp)
         )
     }
 }

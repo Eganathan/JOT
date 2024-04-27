@@ -179,6 +179,7 @@ fun ContextMenuButton(menuItems: List<MenuItem>) {
     }
 
     DropdownMenu(
+        modifier = Modifier.padding(bottom = 5.dp, top = 10.dp),
         expanded = isOpen,
         onDismissRequest = { state = false }
     ) {
