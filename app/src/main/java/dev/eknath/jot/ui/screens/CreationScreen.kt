@@ -68,6 +68,7 @@ import dev.eknath.jot.ui.constants.JOTColors
 import dev.eknath.jot.ui.screens.states.EditorState
 import dev.eknath.jot.wordCount
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,6 +111,7 @@ fun CreationComponent(
     val onValueChange: () -> Unit = {
         lastJob?.cancel()
         lastJob = scope.launch {
+            delay(300)
             if (editorState.viewModel.selectedNoteId.value == null) {
                 editorState.createJot()
             } else {
