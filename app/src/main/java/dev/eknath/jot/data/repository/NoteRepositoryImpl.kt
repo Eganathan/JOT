@@ -48,4 +48,8 @@ class NoteRepositoryImpl @Inject constructor(
         noteDao.deleteAllByIds(notes)
     }
 
+    override suspend fun switchFavorite(id: Long, isFav: Boolean) {
+        return noteDao.switchFav(id = id,isFav = isFav)
+    }
+
 }

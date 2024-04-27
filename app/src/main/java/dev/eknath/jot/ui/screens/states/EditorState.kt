@@ -1,5 +1,7 @@
 package dev.eknath.jot.ui.screens.states
 
+import android.util.Log
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -13,6 +15,8 @@ class EditorState(val viewModel: NoteViewModel) {
     val entryTextFieldState = mutableStateOf(TextFieldValue("", TextRange.Zero))
     val searchTextField = mutableStateOf(TextFieldValue("", TextRange.Zero))
 
+    val isFavorite = mutableStateOf( false)
+
     fun createJot() {
         if (titleTextFieldState.value.text.isNotBlank() || entryTextFieldState.value.text.isNotBlank()) {
             viewModel.addNote(
@@ -20,7 +24,8 @@ class EditorState(val viewModel: NoteViewModel) {
                     title = titleTextFieldState.value.text,
                     content = entryTextFieldState.value.text,
                     createdDate = System.currentTimeMillis().getDate(),
-                    lastModifiedDate = System.currentTimeMillis().getDate()
+                    lastModifiedDate = System.currentTimeMillis().getDate(),
+                    isFavorite = isFavorite.value
                 )
             )
         }
@@ -44,6 +49,7 @@ class EditorState(val viewModel: NoteViewModel) {
                         selectedNote.content.length,
                     )
                 )
+                isFavorite.value = selectedNote.isFavorite
                 onSuccess.invoke()
             } else {
                 onFailure.invoke()
@@ -60,11 +66,21 @@ class EditorState(val viewModel: NoteViewModel) {
                         title = titleTextFieldState.value.text,
                         content = entryTextFieldState.value.text,
                         createdDate = viewModel.selectedNote.value?.createdDate ?: "0L",
-                        lastModifiedDate = System.currentTimeMillis().getDate()
+                        lastModifiedDate = System.currentTimeMillis().getDate(),
+                        isFavorite = isFavorite.value
                     )
                 )
             } else {
                 viewModel.deleteNoteById(it)
+            }
+        }
+    }
+
+    fun switchFavorite(isFav: Boolean) {
+        viewModel.selectedNoteId.value?.let {
+            if (titleTextFieldState.value.text.isNotBlank() || entryTextFieldState.value.text.isNotBlank()) {
+                isFavorite.value = isFav
+                viewModel.switchFav(id = it, isFav = isFavorite.value)
             }
         }
     }

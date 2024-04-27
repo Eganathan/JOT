@@ -9,6 +9,6 @@ data class NoteEntity(
     val title: String,
     val content: String,
     val modifiedTimeStamp: Long,
-    val createdTimeStamp: Long = 0L
-
+    val createdTimeStamp: Long = 0L,
+    val isFav: Boolean = false
 )

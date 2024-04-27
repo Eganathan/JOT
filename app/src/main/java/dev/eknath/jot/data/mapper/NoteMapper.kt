@@ -14,7 +14,8 @@ class NoteMapper {
             title = entity.title,
             content = entity.content,
             createdDate = entity.createdTimeStamp.getDate(),
-            lastModifiedDate = entity.modifiedTimeStamp.getDate()
+            lastModifiedDate = entity.modifiedTimeStamp.getDate(),
+            isFavorite = entity.isFav
         )
     }
 
@@ -24,7 +25,8 @@ class NoteMapper {
             title = note.title,
             content = note.content,
             modifiedTimeStamp = note.lastModifiedDate.toLongTimestamp(),
-            createdTimeStamp = note.createdDate.toLongTimestamp()
+            createdTimeStamp = note.createdDate.toLongTimestamp(),
+            isFav = note.isFavorite
         )
     }
 

@@ -11,4 +11,5 @@ interface NoteRepository {
     suspend fun update(note: Note)
     suspend fun delete(id: Long)
     suspend fun deleteAll(notes: List<Long>)
+    suspend fun switchFavorite(id: Long, isFav: Boolean)
 }

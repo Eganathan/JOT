@@ -24,7 +24,13 @@ interface NoteDao {
     suspend fun insert(note: NoteEntity): Long
 
     @Update
-    suspend fun update(note: NoteEntity) //
+    suspend fun update(note: NoteEntity)
+
+    @Transaction
+    suspend fun switchFav(id: Long, isFav: Boolean) {
+        val task = getNoteById(id) ?: return
+        update(task.copy(isFav = isFav))
+    }
 
     @Query("DELETE FROM jots WHERE id IN (:id)")
     suspend fun delete(id: Long)

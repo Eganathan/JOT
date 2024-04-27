@@ -41,6 +41,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -78,15 +79,12 @@ fun CreationComponent(
     val context = LocalContext.current
 
     val confirmationDialog = remember { mutableStateOf(false) }
-    val isStarred = remember { mutableStateOf(false) }
+    val isFavourite by remember { derivedStateOf { editorState.isFavorite.value } }
 
     val isDarkTheme = isSystemInDarkTheme()
     var selectedColor =
         MaterialTheme.colorScheme.background //by remember { mutableStateOf(if (isDarkTheme) JOTColors.GREEN.dark else JOTColors.GREEN.light) }
 
-//    val onToggleSelection = { //todo impl pinnable
-//        selected.value = !selected.value
-//    }
 
     val onShare = {
         context.shareNote(
@@ -168,10 +166,10 @@ fun CreationComponent(
 
                     IconButton(
                         onClick = {
-                            isStarred.value = !isStarred.value
+                            editorState.switchFavorite(isFav = !isFavourite)
                         }) {
                         Icon(
-                            painter = painterResource(id = if (isStarred.value) R.drawable.ic_selected else R.drawable.ic_unselected_star),
+                            painter = painterResource(id = if (isFavourite) R.drawable.ic_selected else R.drawable.ic_unselected_star),
                             contentDescription = "",
                             modifier = Modifier.size(25.dp),
                             tint = MaterialTheme.colorScheme.onBackground

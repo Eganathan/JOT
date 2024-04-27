@@ -25,6 +25,7 @@ import dev.eknath.jot.domain.usecase.DeleteNoteUseCase
 import dev.eknath.jot.domain.usecase.GetAllNotesUseCase
 import dev.eknath.jot.domain.usecase.GetNoteUseCase
 import dev.eknath.jot.domain.usecase.SearchNotesUseCase
+import dev.eknath.jot.domain.usecase.SwitchFavUseCase
 import dev.eknath.jot.domain.usecase.UpdateNoteUseCase
 import javax.inject.Inject
 
@@ -38,6 +39,7 @@ class NoteViewModel @Inject constructor(
     private val deleteNoteUseCase: DeleteNoteUseCase,
     private val bulkDeleteUseCase: BulkDeleteUseCase,
     private val searchUseCase: SearchNotesUseCase,
+    private val switchFavUseCase: SwitchFavUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -76,6 +78,10 @@ class NoteViewModel @Inject constructor(
 
     fun updateNote(note: Note) = viewModelScope.launch {
         updateNoteUseCase(note)
+    }
+
+    fun switchFav(id: Long, isFav: Boolean) = viewModelScope.launch {
+        switchFavUseCase(id, isFav = isFav)
     }
 
     fun deleteNoteById(id: Long) = viewModelScope.launch {

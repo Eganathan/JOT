@@ -210,6 +210,7 @@ fun HomeScreen(editorState: EditorState) {
             Column(modifier = Modifier
                 .fillMaxSize()
                 .padding(it)) {
+                //Switches from LIST to GRID View vise versa
 //                Row(
 //                    modifier = Modifier
 //                        .fillMaxWidth()
