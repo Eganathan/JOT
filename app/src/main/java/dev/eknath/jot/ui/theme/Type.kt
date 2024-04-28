@@ -22,15 +22,13 @@ val Typography = Typography(
     titleMedium = TextStyle(
         fontFamily = fontFamily,
         fontWeight = FontWeight.ExtraBold,
-        fontSize = 24.sp,
-//        lineHeight = 32.sp,
+        fontSize = 32.sp,
         letterSpacing = 0.sp
     ),
     titleSmall = TextStyle(
         fontFamily = fontFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 20.sp,
-//        lineHeight = 32.sp,
         letterSpacing = 0.sp
     ),
     bodySmall = TextStyle(

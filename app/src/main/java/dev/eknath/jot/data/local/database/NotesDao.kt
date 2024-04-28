@@ -11,7 +11,7 @@ import java.util.Date
 
 @Dao
 interface NoteDao {
-    @Query("SELECT * FROM jots")
+    @Query("SELECT * FROM jots ORDER BY modifiedTimeStamp DESC")
     fun getAllNotes(): Flow<List<NoteEntity>>
 
     @Query("SELECT * FROM jots WHERE id == :id")

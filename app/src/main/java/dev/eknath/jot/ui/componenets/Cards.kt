@@ -71,14 +71,14 @@ fun NoteDisplayCard(
             onTap = onTap
         )
 
-
     Card(
         modifier = cardModifier,
         shape = shape,
         colors = CardDefaults.cardColors(containerColor = color),
     ) {
         Box(modifier = Modifier.padding(10.dp)) {
-            Column(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 2.dp))
+            {
                 if (title.isNotBlank())
                     Text(
                         text = title.toTitleCase(),
