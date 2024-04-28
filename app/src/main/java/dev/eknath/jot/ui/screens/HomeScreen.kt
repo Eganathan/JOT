@@ -309,6 +309,7 @@ fun HomeScreen(editorState: EditorState) {
                                         createdTime = note.createdDate,
                                         modifiedTime = note.lastModifiedDate,
                                         isSelected = multiSelectedIds.value::contains.invoke(note.id),
+                                        isFav = note.isFavorite,
                                         onLongPress = {
                                             screenMode.value = MODE.SELECTION
                                             multiSelectedIds.value =
@@ -338,6 +339,11 @@ fun HomeScreen(editorState: EditorState) {
                                     item {
                                         ErrorContent()
                                     }
+                                if (searchState.value && searchedNotes.isEmpty())
+                                    item {
+                                        SearchEmptyContent()
+                                    }
+
                             })
                 }
             }
@@ -389,6 +395,29 @@ private fun ErrorContent() {
         Text(text = stringResource(id = R.string.empty_note_title), fontWeight = FontWeight.Bold)
         Text(
             text = stringResource(id = R.string.empty_note_description),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(top = 5.dp, start = 30.dp, end = 30.dp)
+        )
+    }
+}
+
+@Composable
+private fun SearchEmptyContent() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Spacer(modifier = Modifier.height(100.dp))
+        Image(
+            painter = painterResource(id = R.drawable.ic_search_empty),
+            contentDescription = ""
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        Text(text = stringResource(id = R.string.search_empty_note_title), fontWeight = FontWeight.Bold)
+        Text(
+            text = stringResource(id = R.string.search_empty_note_description),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(top = 5.dp, start = 30.dp, end = 30.dp)

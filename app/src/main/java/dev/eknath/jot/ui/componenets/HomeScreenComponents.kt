@@ -135,7 +135,7 @@ internal fun SearchTextField(
                 AnimatedVisibility(value.text.isEmpty()) {
                     Text(
                         text = if (!isTextFieldFocused.value && showTitle) title else placeholder,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleSmall,
                         fontWeight = if (!isTextFieldFocused.value && showTitle) FontWeight.Bold else FontWeight.Normal,
                         textAlign = TextAlign.Center,
                         modifier = Modifier

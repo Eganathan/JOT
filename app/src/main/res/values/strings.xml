@@ -9,4 +9,8 @@
 
     <string name="empty_note_title" translatable="false">Create your first note!</string>
     <string name="empty_note_description" translatable="false">You can get started by clicking the + button and start jotting down..</string>
+
+    <string name="search_empty_note_title" translatable="false">Can\'t find anything here!</string>
+    <string name="search_empty_note_description" translatable="false">You can create one by clicking the + button...</string>
+
 </resources>

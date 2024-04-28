@@ -250,7 +250,7 @@ fun CreationComponent(
 
             TextField(
                 modifier = Modifier
-                    .offset(y = (-17).dp)
+                    .offset(y = (-22).dp)
                     .fillMaxSize()
                     .focusRequester(focusRequester),
                 value = editorState.entryTextFieldState.value,
