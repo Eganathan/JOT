@@ -26,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -36,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
@@ -167,21 +169,24 @@ private fun MenuItem(menuItem: MenuItem) {
 }
 
 @Composable
-fun ContextMenuButton(menuItems: List<MenuItem>) {
-    var state by remember { mutableStateOf(false) }
-    val isOpen by remember { derivedStateOf { state } }
+fun ContextMenuButton(enabled: Boolean, state: MutableState<Boolean>, menuItems: List<MenuItem>) {
+    //remove state from Mutablestate to state and add a callback
+    val isOpen by remember { derivedStateOf { state.value } }
 
-    IconButton(onClick = { state = !state }) {
+    IconButton(enabled = enabled, onClick = { state.value = !state.value }) {
         Icon(
             Icons.Filled.MoreVert, contentDescription = "More options",
-            tint = MaterialTheme.colorScheme.onBackground
+            tint = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.graphicsLayer {
+                this.alpha = if (enabled) 1f else 0.3f
+            }
         )
     }
 
     DropdownMenu(
         modifier = Modifier.padding(bottom = 5.dp, top = 10.dp),
         expanded = isOpen,
-        onDismissRequest = { state = false }
+        onDismissRequest = { state.value = false }
     ) {
         menuItems.forEach { item ->
             MenuItem(item)

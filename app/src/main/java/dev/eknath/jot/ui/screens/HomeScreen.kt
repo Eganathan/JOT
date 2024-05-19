@@ -1,19 +1,16 @@
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package dev.eknath.jot.ui.screens
 
 import DrawerBottomCredits
 import DrawerOptionsContent
 import DrawerTitleContent
-import android.widget.Space
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -62,10 +59,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -75,12 +73,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
 import dev.eknath.jot.R
-import kotlinx.coroutines.launch
 import dev.eknath.jot.togglePresence
 import dev.eknath.jot.ui.componenets.HomeTopBarSearchComponent
 import dev.eknath.jot.ui.componenets.NoteDisplayCard
 import dev.eknath.jot.ui.componenets.NoteDisplayGridCard
 import dev.eknath.jot.ui.screens.states.EditorState
+import kotlinx.coroutines.launch
 
 enum class MODE {
     VIEW, SELECTION;
@@ -115,6 +113,7 @@ fun HomeScreen(editorState: EditorState) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val focusRequester = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -167,6 +166,7 @@ fun HomeScreen(editorState: EditorState) {
                             },
                             onOptionsClick = {
                                 scope.launch {
+                                    keyboardController?.hide()
                                     drawerState.open()
                                 }
                             },
@@ -415,7 +415,10 @@ private fun SearchEmptyContent() {
             contentDescription = ""
         )
         Spacer(modifier = Modifier.height(10.dp))
-        Text(text = stringResource(id = R.string.search_empty_note_title), fontWeight = FontWeight.Bold)
+        Text(
+            text = stringResource(id = R.string.search_empty_note_title),
+            fontWeight = FontWeight.Bold
+        )
         Text(
             text = stringResource(id = R.string.search_empty_note_description),
             textAlign = TextAlign.Center,

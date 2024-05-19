@@ -54,6 +54,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -84,12 +85,13 @@ fun CreationComponent(
     val scope = rememberCoroutineScope()
     var lastJob: Job? = null
 
+    val contextMenuState = remember { mutableStateOf(false) }
     val confirmationDialog = remember { mutableStateOf(false) }
     val isFavourite by remember { derivedStateOf { editorState.isFavorite.value } }
+    val enabledActions =
+        remember { derivedStateOf { editorState.entryTextFieldState.value.text.isNotBlank() || editorState.titleTextFieldState.value.text.isNotBlank() } }
 
-    val isDarkTheme = isSystemInDarkTheme()
-    var selectedColor =
-        MaterialTheme.colorScheme.background //by remember { mutableStateOf(if (isDarkTheme) JOTColors.GREEN.dark else JOTColors.GREEN.light) }
+    val selectedColor = MaterialTheme.colorScheme.background
 
 
     val onShare = {
@@ -97,6 +99,7 @@ fun CreationComponent(
             title = editorState.titleTextFieldState.value.text,
             content = editorState.entryTextFieldState.value.text
         )
+        contextMenuState.value = false
     }
 
     val textFieldColor = TextFieldDefaults.textFieldColors(
@@ -137,7 +140,7 @@ fun CreationComponent(
 //                        )
 //                    }
                     IconButton(
-                        enabled = editorState.entryTextFieldState.value.text.isNotBlank(),
+                        enabled = enabledActions.value,
                         onClick = {
                             readOutLoud(
                                 context = context,
@@ -157,7 +160,11 @@ fun CreationComponent(
                             painter = painterResource(id = R.drawable.ic_play),
                             contentDescription = "",
                             tint = MaterialTheme.colorScheme.onBackground,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier
+                                .size(24.dp)
+                                .graphicsLayer {
+                                    this.alpha = if (enabledActions.value) 1f else 0.3f
+                                },
                         )
                     }
 //                    IconButton(
@@ -175,18 +182,25 @@ fun CreationComponent(
 //                    ColorsSelectors(selectedJotColor = JOTColors.GREEN)
 
                     IconButton(
+                        enabled = enabledActions.value,
                         onClick = {
                             editorState.switchFavorite(isFav = !isFavourite)
                         }) {
                         Icon(
                             painter = painterResource(id = if (isFavourite) R.drawable.ic_selected else R.drawable.ic_unselected_star),
                             contentDescription = "",
-                            modifier = Modifier.size(25.dp),
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
+                            modifier = Modifier
+                                .size(25.dp)
+                                .graphicsLayer {
+                                    this.alpha = if (enabledActions.value) 1f else 0.3f
+                                },
+                            tint = MaterialTheme.colorScheme.onBackground,
+
+                            )
                     }
 
                     IconButton(
+                        enabled = enabledActions.value,
                         onClick = {
                             onValueChange()
                             onBackPressed()
@@ -194,12 +208,18 @@ fun CreationComponent(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_save),
                             contentDescription = "",
-                            modifier = Modifier.size(25.dp),
+                            modifier = Modifier
+                                .size(25.dp)
+                                .graphicsLayer {
+                                    this.alpha = if (enabledActions.value) 1f else 0.3f
+                                },
                             tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
 
                     ContextMenuButton(
+                        enabled = enabledActions.value,
+                        state = contextMenuState,
                         listOf(
                             MenuItem(
                                 iconRes = R.drawable.ic_share,
@@ -211,6 +231,7 @@ fun CreationComponent(
                                 title = "Delete",
                                 onClick = {
                                     confirmationDialog.value = true
+                                    contextMenuState.value = false
                                 }
                             )
                         )
