@@ -6,7 +6,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import dev.eknath.jot.domain.model.Note
 import dev.eknath.jot.getDate
-import dev.eknath.jot.ui.screens.NoteViewModel
+import dev.eknath.jot.ui.screens.notes.NoteViewModel
 
 class EditorState(val viewModel: NoteViewModel) {
 

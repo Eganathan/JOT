@@ -1,4 +1,4 @@
-package dev.eknath.jot.ui.screens
+package dev.eknath.jot.ui.screens.notes
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
