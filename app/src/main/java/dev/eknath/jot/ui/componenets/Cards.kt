@@ -5,7 +5,6 @@ package dev.eknath.jot.ui.componenets
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,15 +25,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import dev.eknath.jot.R
+import dev.eknath.jot.formatDateForUi
 import dev.eknath.jot.onLongPressDetect
-import java.util.Locale
 
 @Composable
 fun NoteDisplayCard(
@@ -77,7 +73,9 @@ fun NoteDisplayCard(
         colors = CardDefaults.cardColors(containerColor = color),
     ) {
         Box(modifier = Modifier.padding(10.dp)) {
-            Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 2.dp))
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 2.dp))
             {
                 if (title.isNotBlank())
                     Text(
@@ -96,9 +94,9 @@ fun NoteDisplayCard(
 
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
-                    text = "Modified ${modifiedTime}",
+                    text = "updated on ${formatDateForUi(modifiedTime)}",
                     fontSize = 12.sp,
-                    color = Color.Black.copy(alpha = 0.8f)
+                    color = Color.White.copy(alpha = 0.9f)
                 )
             }
 

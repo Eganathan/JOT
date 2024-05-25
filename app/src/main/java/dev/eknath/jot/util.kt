@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import dev.eknath.jot.ui.constants.JOTColors
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -252,4 +253,40 @@ fun String.toLongTimestamp(): Long {
         e.printStackTrace()
         return 0L // Handle parsing exceptions (optional)
     }
+}
+
+
+fun formatDateForUi(inputDate: String): String {
+    // Define the input and output date formats
+    val inputDateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+    val outputDateFormat = SimpleDateFormat("dd MMMM yy", Locale.getDefault())
+
+    // Parse the input date
+    val date: Date = inputDateFormat.parse(inputDate) ?: return "-"
+
+    // Get today's date
+    val today = Calendar.getInstance()
+
+    // Get the date for comparison
+    val inputCalendar = Calendar.getInstance().apply { time = date }
+
+    // Check if the input date is today
+    if (isSameDay(inputCalendar, today)) {
+        return "Today"
+    }
+
+    // Check if the input date is yesterday
+    today.add(Calendar.DATE, -1)
+    if (isSameDay(inputCalendar, today)) {
+        return "Yesterday"
+    }
+
+    // Return the formatted date for other days
+    return outputDateFormat.format(date)
+}
+
+// Helper function to compare if two calendars are on the same day
+private fun isSameDay(calendar1: Calendar, calendar2: Calendar): Boolean {
+    return calendar1.get(Calendar.YEAR) == calendar2.get(Calendar.YEAR) &&
+            calendar1.get(Calendar.DAY_OF_YEAR) == calendar2.get(Calendar.DAY_OF_YEAR)
 }
