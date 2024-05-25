@@ -315,6 +315,12 @@ fun HomeScreen(editorState: EditorState) {
                                             multiSelectedIds.value =
                                                 multiSelectedIds.value.plus(note.id)
                                         },
+                                        onToggleFav = {
+                                            editorState.switchFavorite(
+                                                isFav = it,
+                                                selectedNoteId = note.id
+                                            )
+                                        },
                                         onTap = {
                                             when (screenMode.value) {
                                                 MODE.VIEW -> {

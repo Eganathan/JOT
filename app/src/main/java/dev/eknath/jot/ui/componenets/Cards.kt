@@ -3,8 +3,10 @@
 package dev.eknath.jot.ui.componenets
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +19,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,6 +50,7 @@ fun NoteDisplayCard(
     isSelected: Boolean,
     onTap: () -> Unit,
     onLongPress: () -> Unit,
+    onToggleFav: (Boolean) -> Unit,
     minSize: Boolean = false,
 ) {
 
@@ -58,7 +62,7 @@ fun NoteDisplayCard(
                 .fillMaxWidth()
                 .wrapContentHeight()
         ) then (if (isSelected) Modifier.border(
-        width = 3.dp,
+        width = 2.dp,
         color = borderColor,
         shape = shape
     ) else Modifier)
@@ -73,9 +77,11 @@ fun NoteDisplayCard(
         colors = CardDefaults.cardColors(containerColor = color),
     ) {
         Box(modifier = Modifier.padding(10.dp)) {
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 2.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 2.dp)
+            )
             {
                 if (title.isNotBlank())
                     Text(
@@ -92,22 +98,35 @@ fun NoteDisplayCard(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = "updated on ${formatDateForUi(modifiedTime)}",
-                    fontSize = 12.sp,
-                    color = Color.White.copy(alpha = 0.9f)
-                )
+                Spacer(modifier = Modifier.height(5.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_modified),
+                        contentDescription = "",
+                        tint = Color.White.copy(alpha = 0.6f),
+                        modifier = Modifier
+                            .padding(end = 3.dp)
+                            .size(15.dp)
+                    )
+                    Text(
+                        text = formatDateForUi(modifiedTime),
+                        fontSize = 12.sp,
+                        color = Color.White.copy(alpha = 0.9f)
+                    )
+                }
             }
 
-            if (isFav)
+            IconButton(modifier = Modifier
+                .size(15.dp)
+                .align(Alignment.TopEnd), onClick = { onToggleFav(!isFav) }) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_selected),
+                    painter = painterResource(id = if (isFav) R.drawable.ic_selected else R.drawable.ic_unselected_star),
                     contentDescription = "",
-                    modifier = Modifier
-                        .size(15.dp)
-                        .align(Alignment.TopEnd)
                 )
+            }
         }
 
     }

@@ -1,7 +1,6 @@
 package dev.eknath.jot.ui.screens.states
 
 import android.util.Log
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -15,7 +14,7 @@ class EditorState(val viewModel: NoteViewModel) {
     val entryTextFieldState = mutableStateOf(TextFieldValue("", TextRange.Zero))
     val searchTextField = mutableStateOf(TextFieldValue("", TextRange.Zero))
 
-    val isFavorite = mutableStateOf( false)
+    val isFavorite = mutableStateOf(false)
 
     fun createJot() {
         if (titleTextFieldState.value.text.isNotBlank() || entryTextFieldState.value.text.isNotBlank()) {
@@ -76,12 +75,14 @@ class EditorState(val viewModel: NoteViewModel) {
         }
     }
 
-    fun switchFavorite(isFav: Boolean) {
-        viewModel.selectedNoteId.value?.let {
-            if (titleTextFieldState.value.text.isNotBlank() || entryTextFieldState.value.text.isNotBlank()) {
+    fun switchFavorite(isFav: Boolean, selectedNoteId: Long? = null, isDetailCall: Boolean = true) {
+        (selectedNoteId ?: viewModel.selectedNoteId.value)?.let {
+            if (isDetailCall && titleTextFieldState.value.text.isNotBlank() || entryTextFieldState.value.text.isNotBlank()) {
                 isFavorite.value = isFav
-                viewModel.switchFav(id = it, isFav = isFavorite.value)
-            }
+                viewModel.switchFav(id = it, isFav = isFav)
+            } else
+                viewModel.switchFav(id = it, isFav = isFav)
+            Log.e("Test", "HERE")
         }
     }
 
